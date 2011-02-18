@@ -276,6 +276,99 @@ Calendar.messagebundle = $H({'en' :
 
           'today' : 'Heute'
         }),
+      'sk' :
+        $H({
+          'monday' : 'Pondelok',
+          'tuesday' : 'Utorok',
+          'wednesday' : 'Streda',
+          'thursday' : 'Štvrtok',
+          'friday' : 'Piatok',
+          'saturday' : 'Sobota',
+          'sunday' : 'Nedeľa',
+
+          'monday_short' : 'Po',
+          'tuesday_short' : 'Ut',
+          'wednesday_short' : 'St',
+          'thursday_short' : 'Št',
+          'friday_short' : 'Pi',
+          'saturday_short' : 'So',
+          'sunday_short' : 'Ne',
+
+          'january' : 'Január',
+          'february' : 'Február',
+          'march' : 'Marec',
+          'april' : 'Apríl',
+          'may' : 'Máj',
+          'june' : 'Jún',
+          'july'  : 'Júl',
+          'august' : 'August',
+          'september'  : 'September',
+          'october' : 'Október',
+          'november' : 'November',
+          'december' : 'December',
+
+          'january_short' : 'Jan',
+          'february_short' : 'Feb',
+          'march_short' : 'Mar',
+          'april_short' : 'Apr',
+          'may_short' : 'Máj',
+          'june_short' : 'Jún',
+          'july_short'  : 'Júl',
+          'august_short' : 'Aug',
+          'september_short'  : 'Sep',
+          'october_short' : 'Okt',
+          'november_short' : 'Nov',
+          'december_short' : 'Dec',
+
+          'today' : 'Dnes'
+        }),
+      'cz' :
+        $H({
+          'monday' : 'Pondělí',
+          'tuesday' : 'Uterý',
+          'wednesday' : 'Středa',
+          'thursday' : 'Čtvrtek',
+          'friday' : 'Pátek',
+          'saturday' : 'Sobota',
+          'sunday' : 'Neděle',
+
+          'monday_short' : 'Po',
+          'tuesday_short' : 'Ut',
+          'wednesday_short' : 'St',
+          'thursday_short' : 'Čt',
+          'friday_short' : 'Pá',
+          'saturday_short' : 'So',
+          'sunday_short' : 'Ne',
+
+          'january' : 'Leden',
+          'february' : 'Únor',
+          'march' : 'Březen',
+          'april' : 'Duben',
+          'may' : 'Květen',
+          'june' : 'Červen',
+          'july'  : 'Červenec',
+          'august' : 'Srpen',
+          'september'  : 'Září',
+          'october' : 'Říjen',
+          'november' : 'Listopad',
+          'december' : 'Prosinec',
+
+          'january_short' : 'Led',
+          'february_short' : 'Úno',
+          'march_short' : 'Bře',
+          'april_short' : 'Dub',
+          'may_short' : 'Kvě',
+          'june_short' : 'Čen',
+          'july_short'  : 'Čec',
+          'august_short' : 'Srp',
+          'september_short'  : 'Zář',
+          'october_short' : 'Říj',
+          'november_short' : 'Lis',
+          'december_short' : 'Pro',
+
+          'today' : 'Dnes'
+        }),
+
     'by' :
       $H({
         'monday' : 'панядзелак', 
