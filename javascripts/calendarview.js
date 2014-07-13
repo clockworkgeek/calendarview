@@ -179,8 +179,9 @@ var Calendar = Class.create({
     // Day Names
     row = new Element('tr');
     for (var i = 0; i < 7; ++i) {
-      cell = new Element('th').update(Calendar.SHORT_DAY_NAMES[(i+Calendar.firstDayOfWeek)%7]);
-      if (i == 0 || i == 6){
+      var day = (i+Calendar.firstDayOfWeek)%7;
+      cell = new Element('th').update(Calendar.SHORT_DAY_NAMES[day]);
+      if (this.isWeekend(day)) {
         cell.addClassName('weekend');
       }
       row.appendChild(cell);
@@ -354,7 +355,7 @@ var Calendar = Class.create({
               cell.addClassName('today');
 
             // Weekend
-            if ([0, 6].indexOf(dayOfWeek) != -1)
+            if (this.isWeekend(dayOfWeek))
               cell.addClassName('weekend');
 
             // Set the date to tommorrow
@@ -528,6 +529,9 @@ var Calendar = Class.create({
     console.log('dateBackedUp: ' + this.dateBackedUp);
   },
 
+  isWeekend: function(day){
+    return Calendar.weekendDays.indexOf(day) != -1;
+  },
 
   setRange: function(minYear, maxYear) {
     this.minYear = minYear;
@@ -737,6 +741,7 @@ Calendar.VERSION = '1.4';
 Calendar.defaultDateFormat = '%Y-%m-%d';
 Calendar.defaultDateTimeFormat = '%Y-%m-%d %H:%M';
 Calendar.firstDayOfWeek = 0;
+Calendar.weekendDays = [0,6];
 
 // we need to postpone the initialization of these structures to let the page define the language of the page
 Calendar.init =  function(){
