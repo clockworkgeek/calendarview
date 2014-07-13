@@ -179,7 +179,7 @@ var Calendar = Class.create({
     // Day Names
     row = new Element('tr');
     for (var i = 0; i < 7; ++i) {
-      cell = new Element('th').update(Calendar.SHORT_DAY_NAMES[i]);
+      cell = new Element('th').update(Calendar.SHORT_DAY_NAMES[(i+Calendar.firstDayOfWeek)%7]);
       if (i == 0 || i == 6){
         cell.addClassName('weekend');
       }
@@ -320,7 +320,7 @@ var Calendar = Class.create({
 
     // Calculate the first day to display (including the previous month)
     date.setDate(1)
-    date.setDate(-(date.getDay()) + 1)
+    date.setDate(-(date.getDay()) + 1 + Calendar.firstDayOfWeek)
 
     // Fill in the days of the month
     Element.getElementsBySelector(this.container, 'tbody tr').each(
@@ -736,6 +736,7 @@ Calendar.VERSION = '1.4';
 
 Calendar.defaultDateFormat = '%Y-%m-%d';
 Calendar.defaultDateTimeFormat = '%Y-%m-%d %H:%M';
+Calendar.firstDayOfWeek = 0;
 
 // we need to postpone the initialization of these structures to let the page define the language of the page
 Calendar.init =  function(){
