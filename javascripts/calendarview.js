@@ -533,7 +533,7 @@ var Calendar = Class.create({
     this.minYear = minYear;
     this.maxYear = maxYear;
   }
-})
+});
 
 // Delete or add new locales from I18n.js according to your needs
 Calendar.messagebundle = $H({'en' :
@@ -814,7 +814,7 @@ Calendar._checkCalendar = function(event) {
   }
   Calendar.closeHandler(window._popupCalendar);
   return Event.stop(event);
-}
+};
 
 //------------------------------------------------------------------------------
 // Event Handlers
@@ -826,7 +826,7 @@ Calendar.handleMouseDownEvent = function(event){
   }
   Event.observe(document, 'mouseup', Calendar.handleMouseUpEvent);
   Event.stop(event)
-}
+};
 
 Calendar.handleMouseUpEvent = function(event){
   var el        = Event.element(event);
@@ -961,7 +961,7 @@ Calendar.handleMouseUpEvent = function(event){
 
   Event.stopObserving(document, 'mouseup', Calendar.handleMouseUpEvent);
   return Event.stop(event);
-}
+};
 
 Calendar.selectHandler = function(calendar){
 
@@ -973,12 +973,12 @@ Calendar.selectHandler = function(calendar){
   if (calendar.shouldClose) {
     Calendar.closeHandler(calendar);
   }
-}
+};
 
 Calendar.closeHandler = function(calendar){
   calendar.hide();
   calendar.shouldClose = false;
-}
+};
 
 
 
