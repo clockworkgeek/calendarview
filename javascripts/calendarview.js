@@ -59,8 +59,8 @@ var Calendar = Class.create({
     }
 
     embedAt                   = params.embedAt              || null;
-    withTime                  = params.withTime             || null;
-    dateFormat                = params.dateFormat           || null;
+    this.withTime             = params.withTime             || null;
+    this.dateFormat           = params.dateFormat           || null;
     initialDate               = params.initialDate          || null;
     popupTriggerElement       = params.popupTriggerElement        || null;
     this.onHideCallback       = params.onHideCallback             || function(date, calendar){};
@@ -84,11 +84,7 @@ var Calendar = Class.create({
       this.embedAt = null;
     }
 
-    this.withTime      = withTime;
-
-    if (dateFormat){
-      this.dateFormat = dateFormat;
-    }else{
+    if (!this.dateFormat){
       if(this.withTime){
         this.dateFormat = Calendar.defaultDateTimeFormat;
       }else{
