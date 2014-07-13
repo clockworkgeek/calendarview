@@ -62,8 +62,9 @@ var Calendar = Class.create({
     this.withTime             = params.withTime             || null;
     this.dateFormat           = params.dateFormat           || null;
     initialDate               = params.initialDate          || null;
-    popupTriggerElement       = params.popupTriggerElement        || null;
-    this.onHideCallback       = params.onHideCallback             || function(date, calendar){};
+    popupTriggerElement       = params.popupTriggerElement  || null;
+    this.disableDateCallback  = params.disableDateCallback  || function(date, calendar){return false;};
+    this.onHideCallback       = params.onHideCallback       || function(date, calendar){};
     this.onDateChangedCallback     = params.onDateChangedCallback || function(date, calendar){};
     this.minuteStep                = params.minuteStep            || 5;
     this.hideOnClickOnDay          = params.hideOnClickOnDay      || false;
@@ -352,6 +353,11 @@ var Calendar = Class.create({
             // Weekend
             if ([0, 6].indexOf(dayOfWeek) != -1)
               cell.addClassName('weekend');
+
+            if (isCurrentMonth && this.disableDateCallback(date, this)) {
+              cell.addClassName('disabled');
+              cell.navAction = 'disabled';
+            }
 
             // Set the date to tommorrow
             date.setDate(day + 1);
