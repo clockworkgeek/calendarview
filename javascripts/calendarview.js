@@ -60,9 +60,7 @@ window.Calendar = Class.create({
 
   initialize: function(params){
 
-    if (! Calendar.init_done){
-      Calendar.init();
-    }
+    initialize_messages();
 
     var embedAt               = params.embedAt              || null;
     this.withTime             = params.withTime             || null;
@@ -752,7 +750,7 @@ Calendar.firstDayOfWeek = 0;
 Calendar.weekendDays = [0,6];
 
 // we need to postpone the initialization of these structures to let the page define the language of the page
-Calendar.init =  function(){
+function initialize_messages(){
 
   Calendar.DAY_NAMES = new Array(
     Calendar.getMessageFor('sunday'),
@@ -803,7 +801,8 @@ Calendar.init =  function(){
     Calendar.getMessageFor('november_short'),
     Calendar.getMessageFor('december_short')
   );
-  Calendar.init_done = true;
+  // initialization is once only, neutralise this func
+  initialize_messages = new Function;
 };
 
 Calendar.NAV_PREVIOUS_YEAR  = -2;
