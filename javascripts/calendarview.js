@@ -758,54 +758,56 @@ Calendar.weekendDays = [0,6];
 // we need to postpone the initialization of these structures to let the page define the language of the page
 function initialize_messages(){
 
+  var getMessageFor = Calendar.getMessageFor;
+
   Calendar.DAY_NAMES = new Array(
-    Calendar.getMessageFor('sunday'),
-    Calendar.getMessageFor('monday'),
-    Calendar.getMessageFor('tuesday'),
-    Calendar.getMessageFor('wednesday'),
-    Calendar.getMessageFor('thursday'),
-    Calendar.getMessageFor('friday'),
-    Calendar.getMessageFor('saturday')
+    getMessageFor('sunday'),
+    getMessageFor('monday'),
+    getMessageFor('tuesday'),
+    getMessageFor('wednesday'),
+    getMessageFor('thursday'),
+    getMessageFor('friday'),
+    getMessageFor('saturday')
   );
 
   Calendar.SHORT_DAY_NAMES = new Array(
-    Calendar.getMessageFor('sunday_short'),
-    Calendar.getMessageFor('monday_short'),
-    Calendar.getMessageFor('tuesday_short'),
-    Calendar.getMessageFor('wednesday_short'),
-    Calendar.getMessageFor('thursday_short'),
-    Calendar.getMessageFor('friday_short'),
-    Calendar.getMessageFor('saturday_short')
+    getMessageFor('sunday_short'),
+    getMessageFor('monday_short'),
+    getMessageFor('tuesday_short'),
+    getMessageFor('wednesday_short'),
+    getMessageFor('thursday_short'),
+    getMessageFor('friday_short'),
+    getMessageFor('saturday_short')
   );
 
   Calendar.MONTH_NAMES = new Array(
-    Calendar.getMessageFor('january'),
-    Calendar.getMessageFor('february'),
-    Calendar.getMessageFor('march'),
-    Calendar.getMessageFor('april'),
-    Calendar.getMessageFor('may'),
-    Calendar.getMessageFor('june'),
-    Calendar.getMessageFor('july'),
-    Calendar.getMessageFor('august'),
-    Calendar.getMessageFor('september'),
-    Calendar.getMessageFor('october'),
-    Calendar.getMessageFor('november'),
-    Calendar.getMessageFor('december')
+    getMessageFor('january'),
+    getMessageFor('february'),
+    getMessageFor('march'),
+    getMessageFor('april'),
+    getMessageFor('may'),
+    getMessageFor('june'),
+    getMessageFor('july'),
+    getMessageFor('august'),
+    getMessageFor('september'),
+    getMessageFor('october'),
+    getMessageFor('november'),
+    getMessageFor('december')
   );
 
   Calendar.SHORT_MONTH_NAMES = new Array(
-    Calendar.getMessageFor('january_short'),
-    Calendar.getMessageFor('february_short'),
-    Calendar.getMessageFor('march_short'),
-    Calendar.getMessageFor('april_short'),
-    Calendar.getMessageFor('may_short'),
-    Calendar.getMessageFor('june_short'),
-    Calendar.getMessageFor('july_short'),
-    Calendar.getMessageFor('august_short'),
-    Calendar.getMessageFor('september_short'),
-    Calendar.getMessageFor('october_short'),
-    Calendar.getMessageFor('november_short'),
-    Calendar.getMessageFor('december_short')
+    getMessageFor('january_short'),
+    getMessageFor('february_short'),
+    getMessageFor('march_short'),
+    getMessageFor('april_short'),
+    getMessageFor('may_short'),
+    getMessageFor('june_short'),
+    getMessageFor('july_short'),
+    getMessageFor('august_short'),
+    getMessageFor('september_short'),
+    getMessageFor('october_short'),
+    getMessageFor('november_short'),
+    getMessageFor('december_short')
   );
   // initialization is once only, neutralise this func
   initialize_messages = new Function;
