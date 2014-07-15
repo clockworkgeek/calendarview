@@ -39,7 +39,10 @@ The differences from the original are
 
 */
 
-var Calendar = Class.create({
+(function(window){
+'use strict';
+
+window.Calendar = Class.create({
 
   container: null,
 
@@ -58,11 +61,11 @@ var Calendar = Class.create({
       Calendar.init();
     }
 
-    embedAt                   = params.embedAt              || null;
+    var embedAt               = params.embedAt              || null;
     this.withTime             = params.withTime             || null;
     this.dateFormat           = params.dateFormat           || null;
-    initialDate               = params.initialDate          || null;
-    popupTriggerElement       = params.popupTriggerElement  || null;
+    var initialDate           = params.initialDate          || null;
+    var popupTriggerElement   = params.popupTriggerElement  || null;
     this.disableDateCallback  = params.disableDateCallback  || function(date, calendar){return false;};
     this.onHideCallback       = params.onHideCallback       || function(date, calendar){};
     this.onDateChangedCallback     = params.onDateChangedCallback || function(date, calendar){};
@@ -259,10 +262,10 @@ var Calendar = Class.create({
 
   updateOuterFieldReal: function(element){
     if (element.tagName == 'DIV' || element.tagName == 'SPAN') {
-      formatted = this.date ? this.date.print(this.dateFormat) : '';
+      var formatted = this.date ? this.date.print(this.dateFormat) : '';
       element.update(formatted);
     } else if (element.tagName == 'INPUT') {
-      formatted = this.date ? this.date.print(this.dateFormatForHiddenField) : '';
+      var formatted = this.date ? this.date.print(this.dateFormatForHiddenField) : '';
       element.value = formatted;
     }
   },
@@ -846,6 +849,14 @@ Calendar.handleMouseUpEvent = function(event){
   // object, return as we have nothing to do.
   if (!calendar) return false;
 
+  // Rounds day of month down as appropriate. Used to navigate months.
+  function setMonth(date, m) {
+    var day = date.getDate();
+    var max = date.getMonthDays(m);
+    if (day > max) date.setDate(max);
+    date.setMonth(m);
+  }
+
   // Clicked on a day
   if (typeof el.navAction == 'undefined') {
 
@@ -903,13 +914,6 @@ Calendar.handleMouseUpEvent = function(event){
     var year = date.getFullYear();
     var mon = date.getMonth();
 
-    function setMonth(m) {
-      var day = date.getDate();
-      var max = date.getMonthDays(m);
-      if (day > max) date.setDate(max);
-      date.setMonth(m);
-    }
-
     switch (el.navAction) {
 
       // Previous Year
@@ -921,11 +925,11 @@ Calendar.handleMouseUpEvent = function(event){
       // Previous Month
       case Calendar.NAV_PREVIOUS_MONTH:
         if (mon > 0) {
-          setMonth(mon - 1);
+          setMonth(date, mon - 1);
         }
         else if (year-- > calendar.minYear) {
           date.__setFullYear(year);
-          setMonth(11);
+          setMonth(date, 11);
         }
         break;
 
@@ -936,10 +940,10 @@ Calendar.handleMouseUpEvent = function(event){
       // Next Month
       case Calendar.NAV_NEXT_MONTH:
         if (mon < 11) {
-          setMonth(mon + 1);
+          setMonth(date, mon + 1);
         }else if (year < calendar.maxYear) {
           date.__setFullYear(year + 1);
-          setMonth(0);
+          setMonth(date, 0);
         }
         break;
 
@@ -1220,3 +1224,4 @@ Date.prototype.__setFullYear = function(y) {
   this.setFullYear(y);
 };
 
+})(self);
