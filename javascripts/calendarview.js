@@ -42,6 +42,9 @@ The differences from the original are
 (function(window){
 'use strict';
 
+// Remember the calendar last opened
+var activeCalendar = null;
+
 window.Calendar = Class.create({
 
   container: null,
@@ -437,7 +440,7 @@ window.Calendar = Class.create({
     this.container.show();
     if (this.isPopup) {
       if (this.hideOnClickElsewhere){
-        window._popupCalendar = this;
+        activeCalendar = this;
         document.observe('mousedown', Calendar._checkCalendar);
       }
     }
@@ -817,13 +820,13 @@ Calendar.NAV_NEXT_YEAR      =  2;
 // document, if the calendar is shown. If the click was outside the open
 // calendar this function closes it.
 Calendar._checkCalendar = function(event) {
-  if (!window._popupCalendar){
+  if (!activeCalendar){
     return false;
   }
-  if (Element.descendantOf(Event.element(event), window._popupCalendar.container)){
+  if (Element.descendantOf(Event.element(event), activeCalendar.container)){
     return;
   }
-  Calendar.closeHandler(window._popupCalendar);
+  Calendar.closeHandler(activeCalendar);
   return Event.stop(event);
 };
 
@@ -992,10 +995,6 @@ Calendar.closeHandler = function(calendar){
   calendar.shouldClose = false;
 };
 
-
-
-// global object that remembers the calendar
-window._popupCalendar = null;
 
 
 //==============================================================================
