@@ -58,32 +58,38 @@ window.Calendar = Class.create({
   shouldClose: false,
   isPopup: true,
 
+  defaults: {
+	dateFormat              : null,
+	disableDateCallback     : function(date, calendar){return false;},
+	hideOnClickElsewhere    : false,
+	hideOnClickOnDay        : false,
+	minuteStep              : 5,
+	onDateChangedCallback   : function(date, calendar){},
+	onHideCallback          : function(date, calendar){},
+	outputFields            : [],
+	popupPositioningStrategy: 'trigger',
+	withTime                : null,
+	x                       : 0,
+	y                       : 0.6,
+  },
+
   initialize: function(params){
 
     initialize_messages();
 
-    var embedAt               = params.embedAt              || null;
-    this.withTime             = params.withTime             || null;
-    this.dateFormat           = params.dateFormat           || null;
-    var initialDate           = params.initialDate          || null;
-    var popupTriggerElement   = params.popupTriggerElement  || null;
-    this.disableDateCallback  = params.disableDateCallback  || function(date, calendar){return false;};
-    this.onHideCallback       = params.onHideCallback       || function(date, calendar){};
-    this.onDateChangedCallback     = params.onDateChangedCallback || function(date, calendar){};
-    this.minuteStep                = params.minuteStep            || 5;
-    this.hideOnClickOnDay          = params.hideOnClickOnDay      || false;
-    this.hideOnClickElsewhere      = params.hideOnClickElsewhere  || false;
-    this.outputFields              = params.outputFields          || $A();
-    this.popupPositioningStrategy  = params.popupPositioningStrategy || 'trigger'; // or 'pointer'
-    this.x = params.x || 0;
-    this.y = params.y || 0.6;
+    Object.extend(this, this.defaults);
+    $H(this.defaults).keys().each(function(key) {
+    	if (params.hasOwnProperty(key)) {
+    		this[key] = params[key];
+    	}
+    }, this);
 
     this.outputFields = $A(this.outputFields).collect(function(f){
       return $(f);
     });
 
-    if (embedAt){
-      this.embedAt = $(embedAt);
+    if (params.embedAt){
+      this.embedAt = $(params.embedAt);
       this.embedAt._calendar = this;
     }else{
       this.embedAt = null;
@@ -100,14 +106,14 @@ window.Calendar = Class.create({
     this.dateFormatForHiddenField = params.dateFormatForHiddenField || this.dateFormat;
 
 
-    if (initialDate) {
-      this.date = this.parseDate(initialDate);
+    if (params.initialDate) {
+      this.date = this.parseDate(params.initialDate);
     }
 
     this.build();
 
     if (this.isPopup) { //Popup Calendars
-      var popupTriggerElement = $(popupTriggerElement);
+      var popupTriggerElement = $(params.popupTriggerElement);
       popupTriggerElement._calendar = this;
 
       popupTriggerElement.observe('click', function(event){
