@@ -7,8 +7,6 @@ written in modern and readable javascript using Prototype.
 * CalendarView  on GitHub: http://wiki.github.com/jsmecham/calendarview/tree
 * CalendarView site: calendarview.org.
 
-Look at the original README in file README.original.markdown
-
 The differences from the original are
 
 * Support for time in the form of two dropdowns for hours and minutes. Can be turned off/on.
