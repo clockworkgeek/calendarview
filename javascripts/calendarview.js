@@ -45,7 +45,7 @@ The differences from the original are
 // Remember the calendar last opened
 var activeCalendar = null;
 
-self.Calendar = Class.create({
+self.Calendar = Class.create({ /** @memberOf Calendar */
 
   container: null,
 
@@ -57,7 +57,7 @@ self.Calendar = Class.create({
   shouldClose: false,
   isPopup: true,
 
-  defaults: {
+//  defaults
 	dateFormat              : null,
 	disableDateCallback     : function(date, calendar){return false;},
 	hideOnClickElsewhere    : false,
@@ -71,22 +71,12 @@ self.Calendar = Class.create({
 	withTime                : null,
 	x                       : 0,
 	y                       : 0.6,
-  },
 
   initialize: function(params){
 
-    Object.extend(this, this.defaults);
-    $H(this.defaults).keys().each(function(key) {
-    	if (params.hasOwnProperty(key)) {
-    		this[key] = params[key];
-    	}
-    }, this);
+    Object.extend(this, params);
 
-    this.locale = new Locale(this.language);
-
-    this.outputFields = $A(this.outputFields).collect(function(f){
-      return $(f);
-    });
+    this.locale = params.locale || new Locale(this.language);
 
     if (params.embedAt){
       this.embedAt = $(params.embedAt);
@@ -96,18 +86,15 @@ self.Calendar = Class.create({
     }
 
     if (!this.dateFormat){
-      if(this.withTime){
-        this.dateFormat = this.locale.get('datetime_format');
-      }else{
-        this.dateFormat = this.locale.get('date_format');
-      }
+        this.dateFormat = this.locale.get(this.withTime ? 'datetime_format' : 'date_format');
     }
 
     this.dateFormatForHiddenField = params.dateFormatForHiddenField || this.dateFormat;
 
 
     if (params.initialDate) {
-      this.date = this.parseDate(params.initialDate) || new Date;
+      this.date = this.initialDate instanceof Date ? this.initialDate
+              : this.parseDate(params.initialDate) || new Date;
     }
 
     this.build();
@@ -130,76 +117,63 @@ self.Calendar = Class.create({
   },
 
   build: function(){
-    if (this.embedAt) {
-      var parentForCalendarTable = this.embedAt;
-      this.isPopup = false;
-    } else {
-      var parentForCalendarTable = document.getElementsByTagName('body')[0];
-      this.isPopup = true;
-    }
-
+    var parentForCalendarTable = this.embedAt || document.body;
+    this.isPopup = !this.embedAt;
 
     var table = new Element('table');
 
-    var thead = new Element('thead');
-    table.appendChild(thead);
+    var thead = table.appendChild(new Element('thead'));
 
-    var firstRow  = new Element('tr');
+    var firstRow = thead.appendChild(new Element('tr'));
 
     if (this.isPopup){
-      var cell = new Element('td');
-      cell.addClassName('draggableHandler');
-      firstRow.appendChild(cell);
+      firstRow.appendChild(new Element('td', {
+          class: 'draggableHandler'
+      }));
 
-      cell = new Element('td', { colSpan: 5 });
-      cell.addClassName('title' );
-      cell.addClassName('draggableHandler');
-      firstRow.appendChild(cell);
+      firstRow.appendChild(new Element('td', {
+          colSpan: 5,
+          class: 'title draggableHandler'
+      }));
 
-      cell = new Element('td');
-      cell.addClassName('closeButton');
-      firstRow.appendChild(cell);
-      cell.update('x');
-
-      cell.observe('mousedown', function(){
-        this.hide();
-      }.bind(this));
+      firstRow.appendChild(new Element('td', {
+          class: 'closeButton'
+      }))
+      .update('x')
+      .observe('mousedown', this.hide.bind(this));
 
 
     }else{
-      var cell = new Element('td', { colSpan: 7 } );
-      firstRow.appendChild(cell);
+      firstRow.appendChild(new Element('td', {
+          colSpan: 7,
+          class: 'title'
+      }));
     }
 
-    cell.addClassName('title');
-
-    thead.appendChild(firstRow);
-
-    var row = new Element('tr')
-    this._drawButtonCell(row, '&#x00ab;', 1, Calendar.NAV_PREVIOUS_YEAR);
-    this._drawButtonCell(row, '&#x2039;', 1, Calendar.NAV_PREVIOUS_MONTH);
-    this._drawButtonCell(row, this.locale.get('today'), 3, Calendar.NAV_TODAY);
-    this._drawButtonCell(row, '&#x203a;', 1, Calendar.NAV_NEXT_MONTH);
-    this._drawButtonCell(row, '&#x00bb;', 1, Calendar.NAV_NEXT_YEAR);
-    thead.appendChild(row)
+    var row = thead.appendChild(new Element('tr'));
+    drawButtonCell(row, '&#x00ab;', 1, Calendar.NAV_PREVIOUS_YEAR, this);
+    drawButtonCell(row, '&#x2039;', 1, Calendar.NAV_PREVIOUS_MONTH, this);
+    drawButtonCell(row, this.locale.get('today'), 3, Calendar.NAV_TODAY, this);
+    drawButtonCell(row, '&#x203a;', 1, Calendar.NAV_NEXT_MONTH, this);
+    drawButtonCell(row, '&#x00bb;', 1, Calendar.NAV_NEXT_YEAR, this);
 
     // Day Names
-    row = new Element('tr');
+    row = thead.appendChild(new Element('tr'));
     for (var i = 0; i < 7; ++i) {
       var day = (i+Calendar.firstDayOfWeek)%7;
-      cell = new Element('th').update(this.locale.get('day_abbrs', day));
+      var cell = new Element('th').update(this.locale.get('day_abbrs', day));
       if (this.isWeekend(day)) {
         cell.addClassName('weekend');
       }
       row.appendChild(cell);
     }
-    thead.appendChild(row);
 
     // Calendar Days
     var tbody = table.appendChild(new Element('tbody'));
     for (i = 6; i > 0; --i) {
-      row = tbody.appendChild(new Element('tr'));
-      row.addClassName('days');
+      row = tbody.appendChild(new Element('tr', {
+          class: 'days'
+      }));
       for (var j = 7; j > 0; --j) {
         cell = row.appendChild(new Element('td'));
         cell.calendar = this;
@@ -210,8 +184,10 @@ self.Calendar = Class.create({
     if (this.withTime){
       var tfoot = table.appendChild(new Element('tfoot'));
       row = tfoot.appendChild(new Element('tr'));
-      cell = row.appendChild(new Element('td', { colSpan: 7 }));
-      cell.addClassName('time');
+      cell = row.appendChild(new Element('td', {
+          colSpan: 7,
+          class: 'time'
+      }));
       var hourSelect = cell.appendChild(new Element('select', { name : 'hourSelect'}));
       for (var i = 0; i < 24; i++) {
         hourSelect.appendChild(new Element('option', {value : i}).update(i));
@@ -228,37 +204,37 @@ self.Calendar = Class.create({
 
       hourSelect.observe('change', function(event){
         if (! this.date) return;
-        var elem = event.element();
-        var selectedIndex = elem.selectedIndex;
-        if ((typeof selectedIndex != 'undefined') && selectedIndex != null){
-          this.date.setHours(elem.options[selectedIndex].value);
+        var hours = $F(event.element());
+        if (isFinite(hours)){
+          this.date.setHours(hours);
           this.updateOuterField();
         }
       }.bind(this));
 
       minuteSelect.observe('change', function(event){
         if (! this.date) return;
-        var elem = event.element();
-        var selectedIndex = elem.selectedIndex;
-        if ((typeof selectedIndex != 'undefined') && selectedIndex != null){
-          this.date.setMinutes(elem.options[selectedIndex].value);
+        var minutes = $F(event.element());
+        if (isFinite(minutes)){
+          this.date.setMinutes(minutes);
           this.updateOuterField();
         }
       }.bind(this))
     }
 
     // Calendar Container (div)
-    this.container = new Element('div');
-    this.container.addClassName('calendar');
+    this.container = new Element('div', {
+        class: 'calendar'
+    });
     if (this.isPopup) {
-      this.container.setStyle({ position: 'absolute', display: 'none' });
-      this.container.addClassName('popup');
+      this.container
+          .setStyle({ position: 'absolute', display: 'none' })
+          .addClassName('popup');
     }
     this.container.appendChild(table);
 
     this.update(this.date);
 
-    Event.observe(this.container, 'mousedown', Calendar.handleMouseDownEvent);
+    Event.observe(this.container, 'click', calendarClick);
 
     parentForCalendarTable.appendChild(this.container);
 
@@ -268,19 +244,20 @@ self.Calendar = Class.create({
   },
 
   updateOuterFieldReal: function(element){
-    if (element.tagName == 'DIV' || element.tagName == 'SPAN') {
+    element = $(element);
+    // test for Form.Element.setValue function
+    if (element.setValue) {
+      var formatted = this.date ? this.locale.formatDate(this.date, this.dateFormatForHiddenField) : '';
+      element.setValue(formatted);
+    }
+    else {
       var formatted = this.date ? this.locale.formatDate(this.date, this.dateFormat) : '';
       element.update(formatted);
-    } else if (element.tagName == 'INPUT') {
-      var formatted = this.date ? this.locale.formatDate(this.date, this.dateFormatForHiddenField) : '';
-      element.value = formatted;
     }
   },
 
   updateOuterFieldWithoutCallback: function(){
-    this.outputFields.each(function(field){
-      this.updateOuterFieldReal(field);
-    }.bind(this));
+    this.outputFields.each(this.updateOuterFieldReal.bind(this));
   },
 
   updateOuterField: function(){
@@ -288,15 +265,6 @@ self.Calendar = Class.create({
     this.onDateChangedCallback(this.date, this);
   },
 
-  viewOutputFields: function(){
-    return this.outputFields.findAll(function(element){
-      if (element.tagName == 'DIV' || element.tagName == 'SPAN'){
-        return true;
-      }else{
-        return false;
-      }
-    });
-  },
 
 
   //----------------------------------------------------------------------------
@@ -328,13 +296,13 @@ self.Calendar = Class.create({
 
     // Calculate the first day to display (including the previous month)
     date.setDate(1);
-    date.setDate(-(date.getDay()) - 6 + Calendar.firstDayOfWeek);
+    date.setDate(-date.getDay() - 6 + Calendar.firstDayOfWeek);
 
     // Fill in the days of the month
-    Element.getElementsBySelector(this.container, 'tbody tr').each(
+    this.container.select('tbody tr').each(
       function(row, i) {
         var rowHasDays = false;
-        row.immediateDescendants().each(
+        row.childElements().each(
           function(cell, j) {
             var day            = date.getDate();
             var dayOfWeek      = date.getDay();
@@ -373,67 +341,23 @@ self.Calendar = Class.create({
             // Set the date to tommorrow
             date.setDate(day + 1);
           }.bind(this)
-        )
+        );
         // Hide the extra row if it contains only days from another month
         !rowHasDays ? row.hide() : row.show();
-      }.bind(this)
-    )
+      }, this
+    );
 
-    Element.getElementsBySelector(this.container, 'tfoot tr td select').each(
-      function(sel){
-        if(sel.name == 'hourSelect'){
-          sel.selectedIndex = hour;
-        }else if(sel.name == 'minuteSelect'){
-          if (this.minuteStep == 1){
-            sel.selectedIndex = minute;
-          }else{
-            sel.selectedIndex = this.findClosestMinute(minute);
-          }
-        }
-      }.bind(this)
-    )
+    if (this.withTime) {
+      this.hourSelect.setValue(hour);
+      this.minuteSelect.setValue(((minute/this.minuteStep)|0)*this.minuteStep);
+    }
 
-    this.container.getElementsBySelector('td.title')[0].update(
-      this.locale.get('months', month) + ' ' + this.dateOrDateBackedUp().getFullYear()
-    )
+    this.container.getElementsBySelector('td.title').invoke('update',
+      this.locale.formatDate(this.dateOrDateBackedUp(), '%B %Y')
+    );
 
   },
 
-
-  findClosestMinute:  function(val){
-    if (val == 0){
-      return 0;
-    }
-    var lowest = ((val / this.minuteStep).floor() * this.minuteStep);
-    var distance = val % this.minuteStep;
-    var minuteValueToShow;
-
-    if (distance <= (this.minuteStep / 2)){
-      minuteValueToShow = lowest;
-    }else{
-      minuteValueToShow = lowest + this.minuteStep;
-    }
-
-    if (minuteValueToShow == 0){
-      return minuteValueToShow;
-    }else if(minuteValueToShow >= 60){
-      return (minuteValueToShow / this.minuteStep).floor() - 1;
-    }else{
-      return minuteValueToShow / this.minuteStep;
-    }
-  },
-
-  _drawButtonCell: function(parentForCell, text, colSpan, navAction) {
-    var cell          = new Element('td');
-    if (colSpan > 1) cell.colSpan = colSpan;
-    cell.className    = 'cvbutton';
-    cell.calendar     = this;
-    cell.navAction    = navAction;
-    cell.innerHTML    = text;
-    cell.unselectable = 'on'; // IE
-    parentForCell.appendChild(cell);
-    return cell;
-  },
 
 
   //------------------------------------------------------------------------------
@@ -445,7 +369,7 @@ self.Calendar = Class.create({
     if (this.isPopup) {
       if (this.hideOnClickElsewhere){
         activeCalendar = this;
-        document.observe('mousedown', Calendar._checkCalendar);
+        document.observe('mousedown', checkActive);
       }
     }
   },
@@ -474,7 +398,7 @@ self.Calendar = Class.create({
 
   hide: function() {
     if (this.isPopup){
-      Event.stopObserving(document, 'mousedown', Calendar._checkCalendar);
+      document.stopObserving('mousedown', checkActive);
     }
     this.container.hide();
     this.onHideCallback(this.date, this);
@@ -499,7 +423,8 @@ self.Calendar = Class.create({
   },
 
   updateIfDateDifferent: function(date) {
-    if (Math.abs(date - this.dateOrDateBackedUp()) >= 60){
+    // if difference > 60s
+    if (Math.abs(date - this.dateOrDateBackedUp()) > 6e4){
       this.update(date);
     }
   },
@@ -568,34 +493,35 @@ Calendar.NAV_NEXT_YEAR      =  2;
 // Static Methods
 //------------------------------------------------------------------------------
 
+function drawButtonCell(parentForCell, text, colSpan, navAction, calendar) {
+    var cell          = new Element('td');
+    if (colSpan > 1) cell.colSpan = colSpan;
+    cell.className    = 'cvbutton';
+    cell.calendar     = calendar;
+    cell.navAction    = navAction;
+    cell.innerHTML    = text;
+    cell.unselectable = 'on'; // IE
+    parentForCell.appendChild(cell);
+    return cell;
+}
+
+
 // This gets called when the user presses a mouse button anywhere in the
 // document, if the calendar is shown. If the click was outside the open
 // calendar this function closes it.
-Calendar._checkCalendar = function(event) {
-  if (!activeCalendar){
-    return false;
+function checkActive(event) {
+  if (activeCalendar && !event.element().descendantOf(activeCalendar.container)){
+      calendarClose(activeCalendar);
+      event.stop();
   }
-  if (Element.descendantOf(Event.element(event), activeCalendar.container)){
-    return;
-  }
-  Calendar.closeHandler(activeCalendar);
-  return Event.stop(event);
 };
 
 //------------------------------------------------------------------------------
 // Event Handlers
 //------------------------------------------------------------------------------
 
-Calendar.handleMouseDownEvent = function(event){
-  if (event.element().type == 'select-one'){ // ignore select elements - not escaping this in Safari leaves select boxes non-functional
-    return true;
-  }
-  Event.observe(document, 'mouseup', Calendar.handleMouseUpEvent);
-  Event.stop(event)
-};
-
-Calendar.handleMouseUpEvent = function(event){
-  var el        = Event.element(event);
+function calendarClick(event){
+  var el        = event.element();
   var calendar  = el.calendar;
   var isNewDate = false;
 
@@ -615,18 +541,17 @@ Calendar.handleMouseUpEvent = function(event){
 
 
     if (calendar.currentDateElement) {
-      Element.removeClassName(calendar.currentDateElement, 'selected');
+      calendar.currentDateElement.removeClassName('selected');
 
       if (dateWasDefined && el == calendar.currentDateElement){
         calendar.backupDateAndCurrentElement();
 
         calendar.updateOuterField();
 
-        Event.stopObserving(document, 'mouseup', Calendar.handleMouseUpEvent);
-        return Event.stop(event);
+        event.stop();
       }
 
-      Element.addClassName(el, 'selected');
+      el.addClassName('selected');
 
       calendar.shouldClose = (calendar.currentDateElement == el);
 
@@ -691,27 +616,24 @@ Calendar.handleMouseUpEvent = function(event){
         break;
     }
 
-    if (Math.abs(date - calendar.dateOrDateBackedUp()) >= 60) {
+    if (Math.abs(date - calendar.dateOrDateBackedUp()) > 6e4) {
       calendar.updateIfDateDifferent(date);
       isNewDate = true;
-    } // else if (el.navAction == 0) {
-    //   isNewDate = (calendar.shouldClose = true);
-    // } // Hm, what did I mean with this code?
+    }
   }
 
   if (isNewDate && event) {
-    Calendar.selectHandler(calendar);
+    calendarSelect(calendar);
   }
 
   if (calendar.shouldClose && event) {
-    Calendar.closeHandler(calendar);
+    calendarClose(calendar);
   }
 
-  Event.stopObserving(document, 'mouseup', Calendar.handleMouseUpEvent);
-  return Event.stop(event);
+  event.stop();
 };
 
-Calendar.selectHandler = function(calendar){
+function calendarSelect(calendar){
 
   // Update dateField value
   calendar.updateOuterField();
@@ -719,11 +641,11 @@ Calendar.selectHandler = function(calendar){
 
   // Call the close handler, if necessary
   if (calendar.shouldClose) {
-    Calendar.closeHandler(calendar);
+    calendarClose(calendar);
   }
 };
 
-Calendar.closeHandler = function(calendar){
+function calendarClose(calendar){
   calendar.hide();
   calendar.shouldClose = false;
 };

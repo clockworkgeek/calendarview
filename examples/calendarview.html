@@ -51,7 +51,7 @@
         // Embedded Calendar
         new Calendar({
            initialDate: $('embeddedDateField').innerHTML,
-           outputFields: $A(['embeddedDateField']),
+           outputFields: ['embeddedDateField'],
            embedAt: 'embeddedCalendar',
            withTime: true
         });
@@ -59,7 +59,7 @@
         // Popup Calendar
         new Calendar({
             initialDate: $('popupDateDate').innerHTML,
-            outputFields: $A(['popupDateDate']),
+            outputFields: ['popupDateDate'],
             
             popupTriggerElement: 'popupDateField',
             onHideCallback : function(date, calendar){console.log('closed, date is ' + date)},
@@ -69,7 +69,7 @@
         
         new Calendar({
             initialDate: $('popupDateDate2').innerHTML,
-            outputFields: $A(['popupDateDate2']),
+            outputFields: ['popupDateDate2'],
           
             popupTriggerElement: 'popupDateField2',
             withTime: false,
@@ -78,7 +78,7 @@
         
         new Calendar({
             initialDate: $('popupDateDate3').innerHTML,
-            outputFields: $A(['popupDateDate3']),
+            outputFields: ['popupDateDate3'],
 
             popupTriggerElement: 'popupDateField3',
             withTime: true,
