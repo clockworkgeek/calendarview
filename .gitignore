@@ -1,3 +1,6 @@
 .DS_Store
 *.tmproj
 releases
+.buildpath
+.project
+.settings/
