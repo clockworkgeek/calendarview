@@ -748,7 +748,7 @@ Calendar.closeHandler = function(calendar){
             datetime_format: '%Y-%m-%d %H:%M',
             meridian: $w('AM PM')
         },
-        en-US: {
+        'en-US': {
             date_format: '%m/%d/%y'
         },
         de: {
