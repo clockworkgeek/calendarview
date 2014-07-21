@@ -48,7 +48,7 @@ Acceptable options are:
 * withTime - can be true or false, when true, the calendar shows two dropdown boxes for hours and minutes.
 * dateFormat - format of the date or date and time. By default for a calendar without time `%Y-%m-%d` is used, for a calendar with time
   `%Y-%m-%d %H:%M` is used. If you provide this option make sure whether it has or doesn't have the time format according to option withTime.
-* language - An IETF language code like "en" or "en_US". For more language choices see I18n.js
+* language - An IETF language code like "en" or "en-US". For more language choices see I18n.js
 * hideOnClickOnDay - can be true or false. If true, the popup calendar will hide once the user clicks of a day. The default is false.
 * hideOnClickElsewhere - can be true or false. If true, the popup calendar will hide once the user clicks elsewhere in the page. 
   The default is false.

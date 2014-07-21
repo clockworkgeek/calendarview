@@ -748,7 +748,7 @@ Calendar.closeHandler = function(calendar){
             datetime_format: '%Y-%m-%d %H:%M',
             meridian: $w('AM PM')
         },
-        en_US: {
+        en-US: {
             date_format: '%m/%d/%y'
         },
         de: {
@@ -778,7 +778,7 @@ Calendar.closeHandler = function(calendar){
      * Ways to instantiate:
      *   english  = new Locale
      *   french   = new Locale('fr')
-     *   american = new Locale('en_US')
+     *   american = new Locale('en-US')
      * 
      * @class
      */
@@ -867,7 +867,7 @@ Calendar.closeHandler = function(calendar){
          * <p>
          * Examples:
          * <code>
-         * new Locale('en_US').parseDate('2/3/00 12:34', '%c')
+         * new Locale('en-US').parseDate('2/3/00 12:34', '%c')
          * new Locale('fr').parseDate('8 avril 2013', '%e %B %Y')
          * // omitted dates default to the Epoch
          * new Locale().parseDate('10pm', '%H%P') => 1970-01-01 22:00
