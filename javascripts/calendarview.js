@@ -39,20 +39,19 @@ The differences from the original are
 
 */
 
-(function(window){
+(function(){
 'use strict';
 
 // Remember the calendar last opened
 var activeCalendar = null;
 
-window.Calendar = Class.create({
+self.Calendar = Class.create({
 
   container: null,
 
   minYear: 1900,
   maxYear: 2100,
 
-  date: new Date(),
   currentDateElement: null,
 
   shouldClose: false,
@@ -63,6 +62,7 @@ window.Calendar = Class.create({
 	disableDateCallback     : function(date, calendar){return false;},
 	hideOnClickElsewhere    : false,
 	hideOnClickOnDay        : false,
+	language                : 'en',
 	minuteStep              : 5,
 	onDateChangedCallback   : function(date, calendar){},
 	onHideCallback          : function(date, calendar){},
@@ -75,14 +75,14 @@ window.Calendar = Class.create({
 
   initialize: function(params){
 
-    initialize_messages();
-
     Object.extend(this, this.defaults);
     $H(this.defaults).keys().each(function(key) {
     	if (params.hasOwnProperty(key)) {
     		this[key] = params[key];
     	}
     }, this);
+
+    this.locale = new Locale(this.language);
 
     this.outputFields = $A(this.outputFields).collect(function(f){
       return $(f);
@@ -97,9 +97,9 @@ window.Calendar = Class.create({
 
     if (!this.dateFormat){
       if(this.withTime){
-        this.dateFormat = Calendar.defaultDateTimeFormat;
+        this.dateFormat = this.locale.get('datetime_format');
       }else{
-        this.dateFormat = Calendar.defaultDateFormat;
+        this.dateFormat = this.locale.get('date_format');
       }
     }
 
@@ -107,7 +107,7 @@ window.Calendar = Class.create({
 
 
     if (params.initialDate) {
-      this.date = this.parseDate(params.initialDate);
+      this.date = this.parseDate(params.initialDate) || new Date;
     }
 
     this.build();
@@ -178,7 +178,7 @@ window.Calendar = Class.create({
     var row = new Element('tr')
     this._drawButtonCell(row, '&#x00ab;', 1, Calendar.NAV_PREVIOUS_YEAR);
     this._drawButtonCell(row, '&#x2039;', 1, Calendar.NAV_PREVIOUS_MONTH);
-    this._drawButtonCell(row,   Calendar.getMessageFor('today'),    3, Calendar.NAV_TODAY);
+    this._drawButtonCell(row, this.locale.get('today'), 3, Calendar.NAV_TODAY);
     this._drawButtonCell(row, '&#x203a;', 1, Calendar.NAV_NEXT_MONTH);
     this._drawButtonCell(row, '&#x00bb;', 1, Calendar.NAV_NEXT_YEAR);
     thead.appendChild(row)
@@ -187,7 +187,7 @@ window.Calendar = Class.create({
     row = new Element('tr');
     for (var i = 0; i < 7; ++i) {
       var day = (i+Calendar.firstDayOfWeek)%7;
-      cell = new Element('th').update(Calendar.SHORT_DAY_NAMES[day]);
+      cell = new Element('th').update(this.locale.get('day_abbrs', day));
       if (this.isWeekend(day)) {
         cell.addClassName('weekend');
       }
@@ -269,10 +269,10 @@ window.Calendar = Class.create({
 
   updateOuterFieldReal: function(element){
     if (element.tagName == 'DIV' || element.tagName == 'SPAN') {
-      var formatted = this.date ? this.date.print(this.dateFormat) : '';
+      var formatted = this.date ? this.locale.formatDate(this.date, this.dateFormat) : '';
       element.update(formatted);
     } else if (element.tagName == 'INPUT') {
-      var formatted = this.date ? this.date.print(this.dateFormatForHiddenField) : '';
+      var formatted = this.date ? this.locale.formatDate(this.date, this.dateFormatForHiddenField) : '';
       element.value = formatted;
     }
   },
@@ -316,9 +316,9 @@ window.Calendar = Class.create({
 
     // Ensure date is within the defined range
     if (date.getFullYear() < this.minYear)
-      date.__setFullYear(this.minYear);
+      date.setYearOnly(this.minYear);
     else if (date.getFullYear() > this.maxYear)
-      date.__setFullYear(this.maxYear);
+      date.setYearOnly(this.maxYear);
 
     if (this.isBackedUp()){
       this.dateBackedUp = new Date(date);
@@ -394,7 +394,7 @@ window.Calendar = Class.create({
     )
 
     this.container.getElementsBySelector('td.title')[0].update(
-      Calendar.MONTH_NAMES[month] + ' ' + this.dateOrDateBackedUp().getFullYear()
+      this.locale.get('months', month) + ' ' + this.dateOrDateBackedUp().getFullYear()
     )
 
   },
@@ -487,7 +487,9 @@ window.Calendar = Class.create({
     if (!format){
       format = this.dateFormat;
     }
-    var res = Date.parseDate(str, format);
+    str = str.trim();
+    format = format.trim();
+    var res = this.locale.parseDate(str, format);
     return res;
   },
 
@@ -497,7 +499,7 @@ window.Calendar = Class.create({
   },
 
   updateIfDateDifferent: function(date) {
-    if (!date.equalsTo(this.dateOrDateBackedUp())){
+    if (Math.abs(date - this.dateOrDateBackedUp()) >= 60){
       this.update(date);
     }
   },
@@ -551,267 +553,10 @@ window.Calendar = Class.create({
   }
 });
 
-// Delete or add new locales from I18n.js according to your needs
-Calendar.messagebundle = $H({'en' :
-  $H({
-    'monday' : 'Monday',
-    'tuesday' : 'Tuesday',
-    'wednesday' : 'Wednesday',
-    'thursday' : 'Thursday',
-    'friday' : 'Friday',
-    'saturday' : 'Saturday',
-    'sunday' : 'Sunday',
-
-    'monday_short' : 'M',
-    'tuesday_short' : 'T',
-    'wednesday_short' : 'W',
-    'thursday_short' : 'T',
-    'friday_short' : 'F',
-    'saturday_short' : 'S',
-    'sunday_short' : 'S',
-
-    'january' : 'January',
-    'february' : 'February',
-    'march' : 'March',
-    'april' : 'April',
-    'may' : 'May',
-    'june' : 'June',
-    'july'  : 'July',
-    'august' : 'August',
-    'september'  : 'September',
-    'october' : 'October',
-    'november' : 'November',
-    'december' : 'December',
-
-    'january_short' : 'Jan',
-    'february_short' : 'Feb',
-    'march_short' : 'Mar',
-    'april_short' : 'Apr',
-    'may_short' : 'May',
-    'june_short' : 'Jun',
-    'july_short'  : 'Jul',
-    'august_short' : 'Aug',
-    'september_short'  : 'Sep',
-    'october_short' : 'Oct',
-    'november_short' : 'Nov',
-    'december_short' : 'Dec',
-
-    'today' : 'Today'
-  }),
-  'fr' :
-    $H({
-      'monday' : 'Lundi',
-      'tuesday' : 'Mardi',
-      'wednesday' : 'Mercredi',
-      'thursday' : 'Jeudi',
-      'friday' : 'Vendredi',
-      'saturday' : 'Samedi',
-      'sunday' : 'Dimanche',
-
-      'monday_short' : 'Lu',
-      'tuesday_short' : 'Ma',
-      'wednesday_short' : 'Me',
-      'thursday_short' : 'Je',
-      'friday_short' : 'Ve',
-      'saturday_short' : 'Sa',
-      'sunday_short' : 'Di',
-
-      'january' : 'janvier',
-      'february' : 'février',
-      'march' : 'mars',
-      'april' : 'avril',
-      'may' : 'mai',
-      'june' : 'juin',
-      'july'  : 'juillet',
-      'august' : 'août',
-      'september'  : 'septembre',
-      'october' : 'octobre',
-      'november' : 'novembre',
-      'december' : 'décembre',
-
-      'january_short' : 'jan',
-      'february_short' : 'fév',
-      'march_short' : 'mar',
-      'april_short' : 'avr',
-      'may_short' : 'mai',
-      'june_short' : 'jun',
-      'july_short'  : 'jul',
-      'august_short' : 'aoû',
-      'september_short'  : 'sep',
-      'october_short' : 'oct',
-      'november_short' : 'nov',
-      'december_short' : 'dec',
-
-      'today' : 'aujourd\'hui'
-    }),
-    'nl' :
-      $H({
-        'monday' : 'maandag',
-        'tuesday' : 'dinsdag',
-        'wednesday' : 'woensdag',
-        'thursday' : 'donderdag',
-        'friday' : 'vrijdag',
-        'saturday' : 'zaterdag',
-        'sunday' : 'zondag',
-
-        'monday_short' : 'Ma',
-        'tuesday_short' : 'Di',
-        'wednesday_short' : 'Wo',
-        'thursday_short' : 'Do',
-        'friday_short' : 'Vr',
-        'saturday_short' : 'Za',
-        'sunday_short' : 'Zo',
-
-        'january' : 'januari',
-        'february' : 'februari',
-        'march' : 'maart',
-        'april' : 'april',
-        'may' : 'mei',
-        'june' : 'juni',
-        'july'  : 'juli',
-        'august' : 'augustus',
-        'september'  : 'september',
-        'october' : 'oktober',
-        'november' : 'november',
-        'december' : 'december',
-
-        'january_short' : 'jan',
-        'february_short' : 'feb',
-        'march_short' : 'mrt',
-        'april_short' : 'apr',
-        'may_short' : 'mei',
-        'june_short' : 'jun',
-        'july_short'  : 'jul',
-        'august_short' : 'aug',
-        'september_short'  : 'sep',
-        'october_short' : 'okt',
-        'november_short' : 'nov',
-        'december_short' : 'dec',
-
-        'today' : 'vandaag'
-      }),
-    'de' :
-      $H({
-        'monday' : 'Montag',
-        'tuesday' : 'Dienstag',
-        'wednesday' : 'Mittwoch',
-        'thursday' : 'Donnerstag',
-        'friday' : 'Freitag',
-        'saturday' : 'Samstag',
-        'sunday' : 'Sonntag',
-
-        'monday_short' : 'Mo',
-        'tuesday_short' : 'Di',
-        'wednesday_short' : 'Mi',
-        'thursday_short' : 'Do',
-        'friday_short' : 'Fr',
-        'saturday_short' : 'Sa',
-        'sunday_short' : 'So',
-
-        'january' : 'Januar',
-        'february' : 'Februar',
-        'march' : 'März',
-        'april' : 'April',
-        'may' : 'Mai',
-        'june' : 'Juni',
-        'july'  : 'Juli',
-        'august' : 'August',
-        'september'  : 'September',
-        'october' : 'Oktober',
-        'november' : 'November',
-        'december' : 'Dezemer',
-
-        'january_short' : 'Jan',
-        'february_short' : 'Feb',
-        'march_short' : 'Mär',
-        'april_short' : 'Apr',
-        'may_short' : 'Mai',
-        'june_short' : 'Jun',
-        'july_short'  : 'Jul',
-        'august_short' : 'Aug',
-        'september_short'  : 'Sep',
-        'october_short' : 'Okt',
-        'november_short' : 'Nov',
-        'december_short' : 'Dez',
-
-        'today' : 'Heute'
-      })
-});
-
-
-Calendar.getMessageFor = function(key){
-
-  var lang = Calendar.language || 'en';
-  if (! Calendar.messagebundle.get(lang)){
-    lang = 'en';
-  }
-  return Calendar.messagebundle.get(lang).get(key);
-};
-
 Calendar.VERSION = '1.4';
 
-Calendar.defaultDateFormat = '%Y-%m-%d';
-Calendar.defaultDateTimeFormat = '%Y-%m-%d %H:%M';
 Calendar.firstDayOfWeek = 0;
 Calendar.weekendDays = [0,6];
-
-// we need to postpone the initialization of these structures to let the page define the language of the page
-function initialize_messages(){
-
-  var getMessageFor = Calendar.getMessageFor;
-
-  Calendar.DAY_NAMES = new Array(
-    getMessageFor('sunday'),
-    getMessageFor('monday'),
-    getMessageFor('tuesday'),
-    getMessageFor('wednesday'),
-    getMessageFor('thursday'),
-    getMessageFor('friday'),
-    getMessageFor('saturday')
-  );
-
-  Calendar.SHORT_DAY_NAMES = new Array(
-    getMessageFor('sunday_short'),
-    getMessageFor('monday_short'),
-    getMessageFor('tuesday_short'),
-    getMessageFor('wednesday_short'),
-    getMessageFor('thursday_short'),
-    getMessageFor('friday_short'),
-    getMessageFor('saturday_short')
-  );
-
-  Calendar.MONTH_NAMES = new Array(
-    getMessageFor('january'),
-    getMessageFor('february'),
-    getMessageFor('march'),
-    getMessageFor('april'),
-    getMessageFor('may'),
-    getMessageFor('june'),
-    getMessageFor('july'),
-    getMessageFor('august'),
-    getMessageFor('september'),
-    getMessageFor('october'),
-    getMessageFor('november'),
-    getMessageFor('december')
-  );
-
-  Calendar.SHORT_MONTH_NAMES = new Array(
-    getMessageFor('january_short'),
-    getMessageFor('february_short'),
-    getMessageFor('march_short'),
-    getMessageFor('april_short'),
-    getMessageFor('may_short'),
-    getMessageFor('june_short'),
-    getMessageFor('july_short'),
-    getMessageFor('august_short'),
-    getMessageFor('september_short'),
-    getMessageFor('october_short'),
-    getMessageFor('november_short'),
-    getMessageFor('december_short')
-  );
-  // initialization is once only, neutralise this func
-  initialize_messages = new Function;
-};
 
 Calendar.NAV_PREVIOUS_YEAR  = -2;
 Calendar.NAV_PREVIOUS_MONTH = -1;
@@ -859,14 +604,6 @@ Calendar.handleMouseUpEvent = function(event){
   // object, return as we have nothing to do.
   if (!calendar) return false;
 
-  // Rounds day of month down as appropriate. Used to navigate months.
-  function setMonth(date, m) {
-    var day = date.getDate();
-    var max = date.getMonthDays(m);
-    if (day > max) date.setDate(max);
-    date.setMonth(m);
-  }
-
   // Clicked on a day
   if (typeof el.navAction == 'undefined') {
 
@@ -898,7 +635,7 @@ Calendar.handleMouseUpEvent = function(event){
         calendar.currentDateElement = el;
       }
     }
-    calendar.date.setDateOnly(el.date);
+    calendar.date.setDatesOnly(el.date);
     isNewDate = true;
 
     calendar.shouldClose = !el.hasClassName('otherDay');
@@ -918,7 +655,7 @@ Calendar.handleMouseUpEvent = function(event){
     var date = new Date(calendar.dateOrDateBackedUp());
 
     if (el.navAction == Calendar.NAV_TODAY){
-      date.setDateOnly(new Date());
+      date.setDatesOnly(new Date());
     }
 
     var year = date.getFullYear();
@@ -929,18 +666,12 @@ Calendar.handleMouseUpEvent = function(event){
       // Previous Year
       case Calendar.NAV_PREVIOUS_YEAR:
         if (year > calendar.minYear)
-          date.__setFullYear(year - 1);
+          date.setYearOnly(year - 1);
         break;
 
       // Previous Month
       case Calendar.NAV_PREVIOUS_MONTH:
-        if (mon > 0) {
-          setMonth(date, mon - 1);
-        }
-        else if (year-- > calendar.minYear) {
-          date.__setFullYear(year);
-          setMonth(date, 11);
-        }
+        date.setMonthOnly(mon - 1);
         break;
 
       // Today
@@ -949,23 +680,18 @@ Calendar.handleMouseUpEvent = function(event){
 
       // Next Month
       case Calendar.NAV_NEXT_MONTH:
-        if (mon < 11) {
-          setMonth(date, mon + 1);
-        }else if (year < calendar.maxYear) {
-          date.__setFullYear(year + 1);
-          setMonth(date, 0);
-        }
+        date.setMonthOnly(mon + 1);
         break;
 
       // Next Year
       case Calendar.NAV_NEXT_YEAR:
         if (year < calendar.maxYear){
-          date.__setFullYear(year + 1);
+          date.setYearOnly(year + 1);
         }
         break;
     }
 
-    if (!date.equalsTo(calendar.dateOrDateBackedUp())) {
+    if (Math.abs(date - calendar.dateOrDateBackedUp()) >= 60) {
       calendar.updateIfDateDifferent(date);
       isNewDate = true;
     } // else if (el.navAction == 0) {
@@ -1003,231 +729,329 @@ Calendar.closeHandler = function(calendar){
 };
 
 
+})();
 
-//==============================================================================
-//
-// Date Object Patches
-//
-// This is pretty much untouched from the original. I really would like to get
-// rid of these patches if at all possible and find a cleaner way of
-// accomplishing the same things. It's a shame Prototype doesn't extend Date at
-// all.
-//
-//==============================================================================
+(function(){
+    'use strict';
 
-Date.DAYS_IN_MONTH = new Array(31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31)
-Date.SECOND        = 1000 /* milliseconds */
-Date.MINUTE        = 60 * Date.SECOND
-Date.HOUR          = 60 * Date.MINUTE
-Date.DAY           = 24 * Date.HOUR
-Date.WEEK          =  7 * Date.DAY
-
-// Parses Date
-Date.parseDate = function(str, fmt) {
-  if (str){
-    str = new String(str);
-  }else{
-    str = new String('');
-  }
-  str = str.strip();
-
-  var today = new Date();
-  var y     = 0;
-  var m     = -1;
-  var d     = 0;
-  var a     = str.split(/\W+/);
-  var b     = fmt.match(/%./g);
-  var i     = 0, j = 0;
-  var hr    = 0;
-  var min   = 0;
-
-  for (i = 0; i < a.length; ++i) {
-    if (!a[i]) continue;
-    switch (b[i]) {
-      case "%d":
-      case "%e":
-        d = parseInt(a[i], 10);
-        break;
-      case "%m":
-        m = parseInt(a[i], 10) - 1;
-        break;
-      case "%Y":
-      case "%y":
-        y = parseInt(a[i], 10);
-        (y < 100) && (y += (y > 29) ? 1900 : 2000);
-        break;
-      case "%b":
-      case "%B":
-        for (j = 0; j < 12; ++j) {
-          if (Calendar.MONTH_NAMES[j].substr(0, a[i].length).toLowerCase() == a[i].toLowerCase()) {
-            m = j;
-            break;
-          }
+    // Initial set of message strings. More can be added with Locale.add(lang, messages)
+    // Note it is not necessary to specify every key, there is some inheritance at work.
+    var strings = {
+        en: {
+            days: $w('Sunday Monday Tuesday Wednesday Thursday Friday Saturday'),
+            day_abbrs: $w('S M T W T F S'),
+            months: $w('January February March April May June July August September October November December'),
+            month_abbrs: $w('Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec'),
+            today: 'Today',
+            date_format: '%Y-%m-%d',
+            time_format: '%H:%M',
+            datetime_format: '%Y-%m-%d %H:%M',
+            meridian: $w('AM PM')
+        },
+        en_US: {
+            date_format: '%m/%d/%y'
+        },
+        de: {
+            days: $w('Sonntag Montag Dienstag Mittwoch Donnerstag Freitag Samstag'),
+            day_abbrs: $w('So Mo Di Mi Do Fr Sa'),
+            months: $w('Januar Februar März April Mai Juni Juli August September Oktober November Dezemer'),
+            month_abbrs: $w('Jan Feb Mär Apr Mai Jun Jul Aug Sep Okt Nov Dez'),
+            today: 'Heute'
+        },
+        fr: {
+            days: $w('Dimanche Lundi Mardi Mercredi Jeudi Vendredi Samedi'),
+            day_abbrs: $w('Di Lu Ma Me Je Ve Sa Di'),
+            months: $w('janvier février mars avril mai juin juillet août septembre octobre novembre décembre'),
+            month_abbrs: $w('jan fév mar avr mai jun jul aoû sep oct nov dec'),
+            today: 'aujourd\'hui'
+        },
+        nl: {
+            days: $w('zondag maandag dinsdag woensdag donderdag vrijdag zaterdag'),
+            day_abbrs: $w('Zo Ma Di Wo Do Vr Za'),
+            months: $w('januari februari maart april mei juni juli augustus september oktober november december'),
+            month_abbrs: $w('jan feb mrt apr mei jun jul aug sep okt nov dec'),
+            today: 'vandaag'
         }
-        break;
-      case "%H":
-      case "%I":
-      case "%k":
-      case "%l":
-        hr = parseInt(a[i], 10);
-        break;
-      case "%P":
-      case "%p":
-        if (/pm/i.test(a[i]) && hr < 12)
-          hr += 12;
-        else if (/am/i.test(a[i]) && hr >= 12)
-          hr -= 12;
-        break;
-      case "%M":
-        min = parseInt(a[i], 10);
-        break;
-    }
-  }
-  if (isNaN(y)) y = today.getFullYear();
-  if (isNaN(m)) m = today.getMonth();
-  if (isNaN(d)) d = today.getDate();
-  if (isNaN(hr)) hr = today.getHours();
-  if (isNaN(min)) min = today.getMinutes();
-  if (y != 0 && m != -1 && d != 0)
-    return new Date(y, m, d, hr, min, 0);
-  y = 0; m = -1; d = 0;
-  for (i = 0; i < a.length; ++i) {
-    if (a[i].search(/[a-zA-Z]+/) != -1) {
-      var t = -1;
-      for (j = 0; j < 12; ++j) {
-        if (Calendar.MONTH_NAMES[j].substr(0, a[i].length).toLowerCase() == a[i].toLowerCase()) { t = j; break; }
-      }
-      if (t != -1) {
-        if (m != -1) {
-          d = m+1;
+    };
+
+    /**
+     * Ways to instantiate:
+     *   english  = new Locale
+     *   french   = new Locale('fr')
+     *   american = new Locale('en_US')
+     * 
+     * @class
+     */
+    self.Locale = Class.create(Hash, { /** @memberOf Locale */
+        initialize: function($super, lang) {
+            $super(strings.en); // default to international English
+            if (lang && Object.isString(lang)) {
+                // if a language is unknown no change happens
+                this.update(strings[lang.slice(0, 2)]);
+                this.update(strings[lang]);
+            }
+        },
+
+        get: function($super, key) {
+            var result = $super(key);
+            // check for extra dimensions of keys
+            var args = $A(arguments).slice(2);
+            while (Object.isArray(result) && args.length) {
+                result = result[args.shift()];
+            }
+            return result;
+        },
+
+        /**
+         * Mimics C's strftime() function.
+         * <p>
+         * ISO 8601 week calculations are not supported.
+         * They would increase project scope too much.
+         * 
+         * @param {Date} date
+         * @param {String} format
+         * @returns {String}
+         */
+        formatDate: function(date, format) {
+            var get = this.get.bind(this);
+            return substitute(format, this).gsub(/%(.)/, function(tag) {
+                switch (tag[1]) {
+                case 'a': return get('day_abbrs', date.getDay());
+                case 'A': return get('days', date.getDay());
+                case 'b':
+                case 'h': return get('month_abbrs', date.getMonth());
+                case 'B': return get('months', date.getMonth());
+                case 'C': return date.getFullYear() / 100 |0;
+                case 'd': return date.getDate().toPaddedString(2);
+                case 'e': return (date.getDate() < 10 ? ' ' : '') + date.getDate();
+                case 'H': return date.getHours().toPaddedString(2);
+                case 'I': return ((date.getHours() + 11) % 12 + 1).toPaddedString(2);
+                case 'j': return date.getDayOfYear().toPaddedString(3);
+                case 'k': return date.getHours();
+                case 'l': return (date.getHours() + 11) % 12 + 1;
+                case 'm': return (date.getMonth() + 1).toPaddedString(2);
+                case 'M': return date.getMinutes().toPaddedString(2);
+                case 'n': return '\n';
+                case 'p': return get('meridian', date.getHours() / 12 |0 % 2);
+                case 'P': return get('meridian', date.getHours() / 12 |0 % 2).toLowerCase();
+                case 's': return date.getTime();
+                case 'S': return date.getSeconds().toPaddedString(2);
+                case 't': return '\t';
+                case 'u': return date.getDay() + 1;
+                case 'U': return date.getWeek(0).toPaddedString(2);
+                case 'w': return date.getDay();
+                case 'W': return date.getWeek(1).toPaddedString(2);
+                case 'y': return (date.getYear() % 100).toPaddedString(2);
+                case 'Y': return date.getFullYear();
+                case 'z':
+                    var offset = date.getTimezoneOffset();
+                    return (offset < 0 ? '-' : '+')
+                        + (offset / 60 |0).abs().toPaddedString(2)
+                        + (offset % 60).toPaddedString(2);
+                // %Z becomes 'Z' which is abbr of 'Zulu' which means local time
+                default: return tag[1];
+                }
+            });
+        },
+
+        /**
+         * Attempt to parse `input` by the given `format`.
+         * Potentially returns a null if input does not match format.
+         * <p>
+         * Parsing dates is necessarily convoluted.
+         * For example "2/3/00" in America is the 3rd of February whereas in
+         * Europe it is the 2nd of March.
+         * This method allows you to be more specific in the order of values.
+         * For a generic method consider the native Date.parse().
+         * Week-based dates are currently unsupported.
+         * <p>
+         * Examples:
+         * <code>
+         * new Locale('en_US').parseDate('2/3/00 12:34', '%c')
+         * new Locale('fr').parseDate('8 avril 2013', '%e %B %Y')
+         * // omitted dates default to the Epoch
+         * new Locale().parseDate('10pm', '%H%P') => 1970-01-01 22:00
+         * </code>
+         * 
+         * @param {String} input
+         * @param {String} format
+         * @returns {Date} Date or null if invalid
+         */
+        parseDate: function(input, format) {
+            var t = this;
+            input = input.toLowerCase();
+            ['days', 'day_abbrs', 'months', 'month_abbrs', 'meridian'].each(
+            function(key) {
+                t.get(key).each(function(str, i) {
+                    input = input.replace(str.toLowerCase(), i.toPaddedString(2));
+                });
+            });
+            // convert format to be more specific
+            format = substitute(RegExp.escape(format), this);
+            var replace = String.prototype.replace;
+            // each tuple is passed to apply, which expects an array
+            // effectively this happens: replace.apply(format, tuple)
+            // which is the same as: format.replace(tuple[0], tuple[1])
+            format = [['%a','%w'],['%A','%w'],['%b','%m'],
+                      ['%B','%m'],['%h','%m'],['%P','%p']]
+                        .inject(format, replace.apply.bind(replace));
+
+            // convert format to regexp pattern
+            var pattern = format.gsub(/%(.)/, function(tag) {
+                switch (tag[1]) {
+                // 2-digit values
+                case 'C':
+                case 'd':
+                case 'H':
+                case 'I':
+                case 'k':
+                case 'l':
+                case 'm':
+                case 'M':
+                case 'p':
+                case 'S':
+                case 'U':
+                case 'W':
+                case 'y': return '(\\d\\d?)';
+                case 'e': return '([1-3\\s]\\d)';
+                // 4-digit years
+                case 'Y': return '(\\d{4})';
+                // 3-digit day
+                case 'j': return '([0-3]\\d\\d)';
+                // unix time
+                case 's': return '([-+]?\\d+)';
+                // 1-digit day of week
+                case 'u':
+                case 'w': return '(\\d)';
+                // timezones
+                case 'z': return '([-+]\\d{4})';
+                case 'Z': return '([A-Z]{1,3})';
+                // literal char
+                default: return '(\\'+tag[1]+')';
+                }
+            });
+
+            // Case insensitive match
+            var found = input.match(new RegExp('^'+pattern+'$', 'i'));
+            if (!found) return null;
+
+            format = [['%k','%H'],['%l','%I'],['%e','%d']]
+                    .inject(format, replace.apply.bind(replace));
+            // values is a hash
+            // did you know pluck works on string indexes too?
+            var values = format.match(/%./g).pluck(1).combine(found.slice(1));
+
+            // values are all strings so far
+            // when not typecast "" == false and "0" == true
+            if (values.s) return new Date(parseInt(values.s));
+            var date = new Date(0);
+            if (values.y) {
+                if (!values.C) values.C = (values.y < 50 ? 20 : 19)
+                values.Y = (values.y|0) + values.C * 100;
+            }
+            if (values.Y && values.m && values.d) {
+                date = new Date(values.Y, values.m, values.d);
+            }
+            else if (values.Y && values.j) {
+                date = new Date(values.Y, 0, values.j);
+            }
+            if (values.I) {
+                // only use meridian when working with 12-hour times
+                values.H = (values.I|0) + (values.p|0 ? 11 : -1);
+            }
+            if (values.z) {
+                values.H += values.z / 100 |0;
+                values.M += values.z % 100;
+            }
+            if (values.H) date.setHours(values.H);
+            if (values.M) date.setMinutes(values.M);
+            if (values.S) date.setSeconds(values.S);
+
+            return date;
         }
-        m = t;
-      }
-    } else if (parseInt(a[i], 10) <= 12 && m == -1) {
-      m = a[i]-1;
-    } else if (parseInt(a[i], 10) > 31 && y == 0) {
-      y = parseInt(a[i], 10);
-      (y < 100) && (y += (y > 29) ? 1900 : 2000);
-    } else if (d == 0) {
-      d = a[i];
+    });
+
+    // private func used by both formatDate and parseDate
+    // it avoids duplication
+    // replace composite tags with individual ones
+    function substitute(format, locale) {
+        return format.gsub(/%(.)/, function(tag) {
+            switch (tag[1]) {
+            case 'c': return locale.get('datetime_format');
+            case 'D': return '%m/%d/%y';
+            case 'F': return '%Y-%m-%d';
+            case 'r': return '%I:%M:%S %p';
+            case 'R': return '%H:%M';
+            case 'T': return '%H:%M:%S';
+            case 'x': return locale.get('date_format');
+            case 'X': return locale.get('time_format');
+            default: return tag[0];
+            }
+        });
     }
-  }
-  if (y == 0)
-    y = today.getFullYear();
-  if (m != -1 && d != 0)
-    return new Date(y, m, d, hr, min, 0);
-  return today;
-};
 
-// Returns the number of days in the current month
-Date.prototype.getMonthDays = function(month) {
-  var year = this.getFullYear()
-  if (typeof month == "undefined")
-    month = this.getMonth()
-  if (((0 == (year % 4)) && ( (0 != (year % 100)) || (0 == (year % 400)))) && month == 1)
-    return 29
-  else
-    return Date.DAYS_IN_MONTH[month]
-};
+    Locale.add = function(lang, messages) {
+        var collection = strings[lang] || {};
+        strings[lang] = Object.extend(collection, messages);
+    };
 
-// Returns the number of day in the year
-Date.prototype.getDayOfYear = function() {
-  var now = new Date(this.getFullYear(), this.getMonth(), this.getDate(), 0, 0, 0);
-  var then = new Date(this.getFullYear(), 0, 0, 0, 0, 0);
-  var time = now - then;
-  return Math.floor(time / Date.DAY);
-};
+    /**
+     * Using this array as keys, create an object filled with specified values.
+     * 
+     * @see PHP's array_combine()
+     */
+    Array.prototype.combine = function(values) {
+        var o = {}, i = 0, l = Math.min(this.length, values.length);
+        while (i < l) {
+            o[this[i]] = values[i++];
+        }
+        return o;
+    }
 
-/** Returns the number of the week in year, as defined in ISO 8601. */
-Date.prototype.getWeekNumber = function() {
-  var d = new Date(this.getFullYear(), this.getMonth(), this.getDate(), 0, 0, 0);
-  var DoW = d.getDay();
-  d.setDate(d.getDate() - (DoW + 6) % 7 + 3); // Nearest Thu
-  var ms = d.valueOf(); // GMT
-  d.setMonth(0);
-  d.setDate(4); // Thu in Week 1
-  return Math.round((ms - d.valueOf()) / (7 * 864e5)) + 1;
-};
+    Object.extend(Date.prototype, { /** @memberOf Date */
+        // difference is positive when `date` is greater than `this`
+        getDaysDifference: function(date) {
+            // compare from midday in case of daylight savings
+            var a = Date.UTC(this.getFullYear(), this.getMonth(), this.getDate(), 12);
+            var b = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate(), 13);
+            var diff = b - a;
+            // divide by milliseconds per day and round down
+            return diff/864e5|0;
+        },
 
-/** Checks date and time equality */
-Date.prototype.equalsTo = function(date) {
-  return ((this.getFullYear() == date.getFullYear()) &&
-   (this.getMonth() == date.getMonth()) &&
-   (this.getDate() == date.getDate()) &&
-   (this.getHours() == date.getHours()) &&
-   (this.getMinutes() == date.getMinutes()));
-};
+        getDayOfYear: function() {
+            return new Date(this.getFullYear(), 0, 0).getDaysDifference(this);
+        },
 
-/** Set only the year, month, date parts (keep existing time) */
-Date.prototype.setDateOnly = function(date) {
-  var tmp = new Date(date);
-  this.setDate(1);
-  this.__setFullYear(tmp.getFullYear());
-  this.setMonth(tmp.getMonth());
-  this.setDate(tmp.getDate());
-};
+        // returns 0..53, weeks 0 & 53 are probably shorter than 7 days
+        getWeek: function(firstday) {
+            firstday = firstday|0;
+            var newyears = new Date(this.getFullYear(), 0, 1);
+            newyears.setDate(1 + firstday - newyears.getDay());
+            return newyears.getDaysDifference(this) / 7 |0;
+        },
 
-/** Prints the date in a string according to the given format. */
-Date.prototype.print = function (str) {
-  var m = this.getMonth();
-  var d = this.getDate();
-  var y = this.getFullYear();
-  var wn = this.getWeekNumber();
-  var w = this.getDay();
-  var s = {};
-  var hr = this.getHours();
-  var pm = (hr >= 12);
-  var ir = (pm) ? (hr - 12) : hr;
-  var dy = this.getDayOfYear();
-  if (ir == 0)
-    ir = 12;
-  var min = this.getMinutes();
-  var sec = this.getSeconds();
-  s["%a"] = Calendar.SHORT_DAY_NAMES[w]; // abbreviated weekday name [FIXME: I18N]
-  s["%A"] = Calendar.DAY_NAMES[w]; // full weekday name
-  s["%b"] = Calendar.SHORT_MONTH_NAMES[m]; // abbreviated month name [FIXME: I18N]
-  s["%B"] = Calendar.MONTH_NAMES[m]; // full month name
-  // FIXME: %c : preferred date and time representation for the current locale
-  s["%C"] = 1 + Math.floor(y / 100); // the century number
-  s["%d"] = (d < 10) ? ("0" + d) : d; // the day of the month (range 01 to 31)
-  s["%e"] = d; // the day of the month (range 1 to 31)
-  // FIXME: %D : american date style: %m/%d/%y
-  // FIXME: %E, %F, %G, %g, %h (man strftime)
-  s["%H"] = (hr < 10) ? ("0" + hr) : hr; // hour, range 00 to 23 (24h format)
-  s["%I"] = (ir < 10) ? ("0" + ir) : ir; // hour, range 01 to 12 (12h format)
-  s["%j"] = (dy < 100) ? ((dy < 10) ? ("00" + dy) : ("0" + dy)) : dy; // day of the year (range 001 to 366)
-  s["%k"] = hr;   // hour, range 0 to 23 (24h format)
-  s["%l"] = ir;   // hour, range 1 to 12 (12h format)
-  s["%m"] = (m < 9) ? ("0" + (1+m)) : (1+m); // month, range 01 to 12
-  s["%M"] = (min < 10) ? ("0" + min) : min; // minute, range 00 to 59
-  s["%n"] = "\n";   // a newline character
-  s["%p"] = pm ? "PM" : "AM";
-  s["%P"] = pm ? "pm" : "am";
-  // FIXME: %r : the time in am/pm notation %I:%M:%S %p
-  // FIXME: %R : the time in 24-hour notation %H:%M
-  s["%s"] = Math.floor(this.getTime() / 1000);
-  s["%S"] = (sec < 10) ? ("0" + sec) : sec; // seconds, range 00 to 59
-  s["%t"] = "\t";   // a tab character
-  // FIXME: %T : the time in 24-hour notation (%H:%M:%S)
-  s["%U"] = s["%W"] = s["%V"] = (wn < 10) ? ("0" + wn) : wn;
-  s["%u"] = w + 1;  // the day of the week (range 1 to 7, 1 = MON)
-  s["%w"] = w;    // the day of the week (range 0 to 6, 0 = SUN)
-  // FIXME: %x : preferred date representation for the current locale without the time
-  // FIXME: %X : preferred time representation for the current locale without the date
-  s["%y"] = ('' + y).substr(2, 2); // year without the century (range 00 to 99)
-  s["%Y"] = y;    // year with the century
-  s["%%"] = "%";    // a literal '%' character
+        setYearOnly: function(year) {
+            var month = this.getMonth();
+            this.setFullYear(year);
+            if (this.getMonth() != month) {
+                this.setDate(0);
+            }
+        },
 
-  return str.gsub(/%./, function(match) { return s[match] || match });
-};
+        setMonthOnly: function(month) {
+            this.setMonth(month);
+            // if overflow to next month set to previous day too
+            if (this.getMonth() != month) {
+                this.setDate(0);
+            }
+        },
 
+        setDatesOnly: function(date) {
+            this.setDate(date.getDate());
+            this.setMonth(date.getMonth());
+            this.setFullYear(date.getFullYear());
+        }
+    });
 
-Date.prototype.__setFullYear = function(y) {
-  var d = new Date(this);
-  d.setFullYear(y);
-  if (d.getMonth() != this.getMonth())
-    this.setDate(28);
-  this.setFullYear(y);
-};
-
-})(self);
+})();
