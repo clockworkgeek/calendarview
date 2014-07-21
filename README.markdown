@@ -28,15 +28,6 @@ The differences from the original are
 Usage
 -----------
 
-Optional setup of the language:
-
-  Calendar.language = 'nl';
-  
-or
-
-  Calendar.language = 'fr';
-  
-
 To create a calendar create an instance of class Calendar:
 
 
@@ -51,12 +42,13 @@ Acceptable options are:
 * parentElement - DOM id of the element where the calendar will appear. This calendar will always be visible on page. If this option
   is missing, the calendar is a popup caledar.
 * triggerElement - DOM id of the element clicking on which will show the popup calendar.
-* dateField - DOM id of the element with date and optionally time. This element can be both an INPIT element or just a DIV or a SPAN. 
+* dateField - DOM id of the element with date and optionally time. This element can be both an INPUT element or just a DIV or a SPAN. 
   When initializing the calendar tries to parse the contents of the element (or value of the INPUT field) and if it's successful, 
   the calendar will show the date/time. The element is updated when the user changes date/time of the calendar.
 * withTime - can be true or false, when true, the calendar shows two dropdown boxes for hours and minutes.
-* dateFormat - format of the date or date and time. By default for a calendar without time %Y-%m-%d is used, for a calendar with time
-  %Y-%m-%d %H:%M is used. If you provide this option make sure whether it has or doesn't have the time format according to option withTime.
+* dateFormat - format of the date or date and time. By default for a calendar without time `%Y-%m-%d` is used, for a calendar with time
+  `%Y-%m-%d %H:%M` is used. If you provide this option make sure whether it has or doesn't have the time format according to option withTime.
+* language - An IETF language code like "en" or "en_US". For more language choices see I18n.js
 * hideOnClickOnDay - can be true or false. If true, the popup calendar will hide once the user clicks of a day. The default is false.
 * hideOnClickElsewhere - can be true or false. If true, the popup calendar will hide once the user clicks elsewhere in the page. 
   The default is false.
