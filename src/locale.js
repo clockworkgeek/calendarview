@@ -298,20 +298,16 @@
             if (this.getMonth() != month) {
                 this.setDate(0);
             }
+            return this;
         },
 
         setMonthOnly: function(month) {
             this.setMonth(month);
             // if overflow to next month set to previous day too
-            if (this.getMonth() != month) {
+            if (this.getMonth() > month) {
                 this.setDate(0);
             }
-        },
-
-        setDatesOnly: function(date) {
-            this.setDate(date.getDate());
-            this.setMonth(date.getMonth());
-            this.setFullYear(date.getFullYear());
+            return this;
         }
     });
 
