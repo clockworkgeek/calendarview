@@ -161,20 +161,22 @@
             var pattern = format.gsub(/%(.)/, function(tag) {
                 switch (tag[1]) {
                 // 2-digit values
-                case 'C':
-                case 'd':
-                case 'H':
-                case 'I':
-                case 'k':
-                case 'l':
-                case 'm':
-                case 'M':
-                case 'p':
-                case 'S':
-                case 'U':
-                case 'W':
-                case 'y': return '(\\d\\d?)';
-                case 'e': return '([1-3\\s]\\d)';
+                case 'C': // century
+                case 'd': // day of month
+                case 'H': // 24 hours
+                case 'I': // 12 hours
+                case 'k': // 24 hours
+                case 'l': // 12 hours
+                case 'm': // month
+                case 'M': // minutes
+                case 'p': // meridian as digits
+                case 'S': // seconds
+                case 'U': // sunday week
+                case 'W': // monday week
+                case 'y': // year
+                    return '(\\d\\d?)';
+                case 'e': // day of month
+                    return '([1-3\\s]\\d)';
                 // 4-digit years
                 case 'Y': return '(\\d{4})';
                 // 3-digit day
@@ -211,7 +213,7 @@
                 values.Y = (values.y|0) + values.C * 100;
             }
             if (values.Y && values.m && values.d) {
-                date = new Date(values.Y, values.m, values.d);
+                date = new Date(values.Y, values.m - 1, values.d);
             }
             else if (values.Y && values.j) {
                 date = new Date(values.Y, 0, values.j);
