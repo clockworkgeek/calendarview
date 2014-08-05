@@ -7,12 +7,6 @@ div.calendar
   width: 217px;
 }
 
-div.calendar.popup
-{
-  margin-left: -40px;
-  margin-top: -100px;
-}
-
 div.calendar table
 {
   background-color: #eee;
