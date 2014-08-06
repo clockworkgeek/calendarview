@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>CalendarView — Dynarch Calendar Compatibility Test</title>
+    <link rel="stylesheet" href="../stylesheets/calendarview.css">
+    <!--[if lte IE 7]>
+    <%= stylesheet_link_tag 'calendarview_ie', :media => :all%>
+    <![endif]-->
+    <style>
+      body {
+        font-family: Trebuchet MS;
+      }
+      div.calendar {
+        max-width: 240px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      div.calendar table {
+        width: 100%;
+      }
+      div.dateField {
+        width: 140px;
+        padding: 6px;
+        -webkit-border-radius: 6px;
+        -moz-border-radius: 6px;
+        color: #555;
+        background-color: white;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+      }
+      div.popupLauncher:hover {
+        background-color: #cde;
+        cursor: pointer;
+      }
+    </style>
+    <script src="../lib/prototype.js"></script>
+    <script src="../lib/effects.js"></script>
+    <script src="../lib/dragdrop.js"></script>
+    <script src="../src/widget.js" charset="utf-8"></script>
+    <script src="../src/calendar.js" charset="utf-8"></script>
+    <script src="../src/locale.js" charset="utf-8"></script>
+    <script src="../src/calendar.setup.js"></script>
+    <script>
+
+Calendar.setup({
+    inputField  : "options_1_date",
+    ifFormat    : "%d/%m/%Y",
+    showsTime   : "false",
+    button      : "options_1_date_trig",
+});
+
+// copied from a real site
+var calendarSetupObject = {
+    inputField  : "options_3_date",
+    ifFormat    : "%d/%m/%Y",
+    showsTime   : "false",
+    button      : "options_3_date_trig",
+    align       : "Bl",
+    singleClick : true
+}
+calendarSetupObject.range = [2014, 2014]
+        
+Calendar.setup(calendarSetupObject);
+
+    </script>
+  </head>
+  <body>
+
+    <div style="float: left; width: 50%">
+      <div style="height: 400px; background-color: #efefef; padding: 10px; -webkit-border-radius: 12px; -moz-border-radius: 12px; margin-left: 10px">
+        <h3 style="text-align: center; background-color: white; -webkit-border-radius: 10px; -moz-border-radius: 10px; margin-top: 0px; margin-bottom: 20px; padding: 8px">
+          Dynarch Calendar Compatibility Test
+        </h3>
+        <div id="popupExample" style="width: 225px; margin: 0 auto;">
+          <input type="text" id="options_1_date" value="" />
+          <img src="calendar.button.gif" alt="Select Date" style="vertical-align: middle" title="Select Date" id="options_1_date_trig" />
+        </div>
+      </div>
+    </div>
+
+    <div style="float: right; width: 50%">
+      <div style="height: 400px; background-color: #efefef; padding: 10px; -webkit-border-radius: 12px; -moz-border-radius: 12px; margin-left: 10px">
+        <h3 style="text-align: center; background-color: white; -webkit-border-radius: 10px; -moz-border-radius: 10px; margin-top: 0px; margin-bottom: 20px; padding: 8px">
+          Dynarch Calendar with Single Click
+        </h3>
+        <div id="popupExample" style="width: 225px; margin: 0 auto;">
+          <input type="text" id="options_3_date" value="" />
+          <img src="calendar.button.gif" alt="Select Date" style="vertical-align: middle" title="Select Date" id="options_3_date_trig" />
+        </div>
+      </div>
+    </div>
+
+  </body>
+</html>
