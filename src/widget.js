@@ -54,7 +54,7 @@
         initialize: function() {
             var t = this;
             // copy all mixins/options to this object
-            $A(arguments).each(t.extend.bind(t));
+            $A(arguments).flatten().each(t.extend.bind(t));
 
             // allow descendents to override locale, or specify language
             t.locale = t.locale || new Locale(t.language);
@@ -68,8 +68,8 @@
         },
 
         initializeElements: function() {
-            this.field = $(this.field);
-            if (!Object.isArray(this.field)) this.field = [this.field];
+            var fields = this.field;
+            this.field = (Object.isArray(fields) ? fields : [fields]).map($).pluck(0).filter(Prototype.K);
             this.element = this.getContent();
         },
 
@@ -139,8 +139,8 @@
     Widget.Popup = { /** @memberOf Widget.Popup */
         initializeElements: function($super) {
             $super();
-            var trigger = $(this.trigger) || this.field;
-            if (!Object.isArray(trigger)) trigger = [trigger];
+            var trigger = this.trigger;
+            trigger = (Object.isArray(trigger) ? trigger : [trigger]).map($).pluck(0).filter(Prototype.K);
             trigger.invoke('observe', 'click', this.toggle.bind(this));
             this.trigger = trigger;
             Event.observe(window, 'resize', this.reposition.bind(this));
