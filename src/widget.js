@@ -148,6 +148,9 @@
 
         getContent: function($super) {
             var element = $super().addClassName('popup');
+            element.insert(new Element('a', {'class': 'closeButton'})
+                .update('x')
+                .observe('click', this.toggle.bind(this)));
             document.body.insert(
                 this.parent = element.wrap('div').absolutize().hide()
             );

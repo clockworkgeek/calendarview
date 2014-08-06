@@ -53,8 +53,18 @@ div.calendar td.cvbutton:hover
   cursor: pointer;
 }
 
+div.calendar .closeButton
+{
+  font-weight: bold;
+  text-align: center;
+  padding: 3px;
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 2em;
+}
 
-div.calendar tr td.closeButton:hover
+div.calendar .closeButton:hover
 {
   background-color: #34ABFA;
   cursor: pointer;
