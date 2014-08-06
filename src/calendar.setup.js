@@ -21,7 +21,7 @@
 
     /*
      * Shim for legacy DHTML calendar.
-     * @see http://www.dynarch.com/jscal/
+     * See http://www.dynarch.com/jscal/
      */
     Calendar.setup = function(args) {
         var mixins = [Widget.Popup];
