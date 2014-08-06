@@ -141,7 +141,7 @@
         parseDate: function(input, format) {
             var t = this;
             input = input.toLowerCase();
-            ['days', 'day_abbrs', 'months', 'month_abbrs', 'meridian'].each(
+            $w('days day_abbrs months month_abbrs meridian').each(
                     function(key) {
                         t.get(key).each(function(str, i) {
                             input = input.replace(str.toLowerCase(), i.toPaddedString(2));
@@ -171,7 +171,9 @@
                 case 'M': // minutes
                 case 'p': // meridian as digits
                 case 'S': // seconds
+                case 'u': // day of week
                 case 'U': // sunday week
+                case 'w': // day of week
                 case 'W': // monday week
                 case 'y': // year
                     return '(\\d\\d?)';
@@ -183,9 +185,6 @@
                 case 'j': return '([0-3]\\d\\d)';
                 // unix time
                 case 's': return '([-+]?\\d+)';
-                // 1-digit day of week
-                case 'u':
-                case 'w': return '(\\d)';
                 // timezones
                 case 'z': return '([-+]\\d{4})';
                 case 'Z': return '([A-Z]{1,3})';
