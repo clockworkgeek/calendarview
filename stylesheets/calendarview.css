@@ -95,6 +95,17 @@ div.calendar tr.days td.otherDay
   color: #bbb;
 }
 
+div.calendar tr.days td.disabled
+{
+  background-color: #ddd;
+  cursor: default;
+  text-shadow: 1px 1px 0.01px #fff;
+}
+div.calendar tr.days td.disabled:not(.otherDay)
+{
+  color: #888;
+}
+
 div.calendar .draggableHandler{
   cursor: move;
 }

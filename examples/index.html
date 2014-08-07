@@ -40,6 +40,7 @@
     <script src="../lib/dragdrop.js"></script>
     <script src="../src/widget.js" charset="utf-8"></script>
     <script src="../src/calendar.js" charset="utf-8"></script>
+    <script src="../src/calendar.disable.js" charset="utf-8"></script>
     <script src="../src/locale.js" charset="utf-8"></script>
     <script>
 
@@ -50,7 +51,7 @@ new Calendar(Widget.Embedded, Calendar.Dates, Calendar.Time, {
 });
 
 // Popup Calendar
-new Calendar(Widget.Popup, Calendar.Dates, Calendar.Time, {
+new Calendar(Widget.Popup, Calendar.Dates, Calendar.Time, Calendar.DisableWeekends, {
     field: 'popupDateDate',
     trigger: 'popupDateField',
     setValue: function($super, date){$super(date); console.log('date changed, date is ' + date)}
@@ -90,7 +91,7 @@ new Calendar(Widget.Popup, Widget.AutoHide, Calendar.Dates, Calendar.Time, {
     <div style="float: right; width: 50%">
       <div style="height: 400px; background-color: #efefef; padding: 10px; -webkit-border-radius: 12px; -moz-border-radius: 12px; margin-left: 10px">
         <h3 style="text-align: center; background-color: white; -webkit-border-radius: 10px; -moz-border-radius: 10px; margin-top: 0px; margin-bottom: 20px; padding: 8px">
-          Popup Calendar
+          Popup Calendar without Weekends
         </h3>
         <div id="popupExample">
           <div id="popupDateDate" class="dateField" style="margin-top: 160px; ">
