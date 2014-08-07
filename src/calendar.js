@@ -41,6 +41,10 @@
         /*
          * Controls should call when updating appropriate element.
          * Other mixins should override to make modifications.
+         * 
+         * @param Date date Value that calendar is being updated to.
+         * @param ObjectRange range The month/day/hour/etc represented by this element.
+         * @param HTMLElement element A single cell/span/etc being updated.
          */
         updatePeriod: function(date, range, element) {
             var value = range.include(this.date = date);
@@ -117,7 +121,7 @@
                 day.update(d.getDate())
                     .toggleClassName('otherDay', d.getMonth() != date.getMonth())
                     .parts = d.getParts(3);
-                this.updatePeriod(date, $R(d.valueOf(), d.setDate(d.getDate()+1), true), day);
+                this.updatePeriod(date, $R(new Date(d), new Date(d.setDate(d.getDate()+1)), true), day);
             }, this);
 
             table.select('.days').each(function(week) {
