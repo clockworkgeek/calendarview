@@ -174,8 +174,7 @@
                 triggerSize = this.relativeTo.getDimensions(),
                 left = (triggerSize.width - elementSize.width)/2,
                 top = triggerSize.height,
-                maxBottom = Math.max(document.body.up().getHeight(),
-                        document.viewport.getScrollOffsets().top + document.viewport.getHeight());
+                maxBottom = document.viewport.getScrollOffsets().top + document.viewport.getHeight();
             if (this.parent.measure('top') + top + elementSize.height > maxBottom) {
                 top = -elementSize.height;
             }
