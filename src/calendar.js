@@ -72,8 +72,6 @@
      * Single month displayed as a table.
      */
     Calendar.Dates = { /** @memberOf Calendar.Dates */
-        firstDayOfWeek: 0,
-
         getContent: function($super) {
             var content = $super();
             var table = this.datesTable = content.addTag('table'),
@@ -82,13 +80,13 @@
                 locale = this.locale,
                 days = locale.get('day_abbrs');
             table.insert('<tfoot><tr><td colspan=7/></tr></tfoot>');
-            for (var i = 0; i < this.firstDayOfWeek; i++) {
+            for (var i = 0; i < locale.get('firstDayOfWeek'); i++) {
                 days.push(days.shift());
             }
 
             thead.insert('<tr><td class=title colspan=7/></tr>');
             thead.insert('<tr><td class="cvbutton otherDay">«</td><td class="cvbutton otherDay">‹</td><td class="cvbutton today" colspan=3>'+
-                    this.locale.get('today') + '</td><td class="cvbutton otherDay">›</td><td class="cvbutton otherDay">»</td></tr>');
+                    locale.get('today') + '</td><td class="cvbutton otherDay">›</td><td class="cvbutton otherDay">»</td></tr>');
             thead.insert('<tr>'+'<th/>'.times(7)+'</tr>');
             thead.select('th').each(function(th, i) {
                 th.update(days[i]).toggleClassName('weekend', locale.isWeekend(i));
@@ -104,7 +102,8 @@
         update: function($super, date) {
             $super(date);
 
-            var table = this.datesTable;
+            var table = this.datesTable,
+                locale = this.locale;
             table.select('.title')[0].update(this.locale.formatDate(date, '%B %Y'));
 
             var buttons = table.select('.cvbutton'),
@@ -116,14 +115,14 @@
             buttons[3].parts = [Y, m+1];
             buttons[4].parts = [Y+1, m];
 
-            var d = new Date(date.getFullYear(), date.getMonth(), 1);
-            d.setDate(1 + this.firstDayOfWeek - d.getDay());
+            var dd = new Date(date.getFullYear(), date.getMonth(), 1);
+            dd.setDate(1 + locale.get('firstDayOfWeek') - dd.getDay());
             table.select('.days td').each(function(day) {
-                day.update(d.getDate())
-                    .toggleClassName('otherDay', d.getMonth() != date.getMonth())
-                    .toggleClassName('weekend', this.locale.isWeekend(d))
-                    .parts = d.getParts(3);
-                this.updatePeriod(date, $R(new Date(d), new Date(d.setDate(d.getDate()+1)), true), day);
+                day.update(dd.getDate())
+                    .toggleClassName('otherDay', dd.getMonth() != date.getMonth())
+                    .toggleClassName('weekend', locale.isWeekend(dd))
+                    .parts = dd.getParts(3);
+                this.updatePeriod(date, $R(new Date(dd), new Date(dd.setDate(dd.getDate()+1)), true), day);
             }, this);
 
             table.select('.days').each(function(week) {

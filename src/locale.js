@@ -32,6 +32,7 @@
                 time_format: '%H:%M',
                 datetime_format: '%Y-%m-%d %H:%M',
                 meridian: $w('AM PM'),
+                firstDayOfWeek: 0,
                 weekend: [0,6]
             }
     };
