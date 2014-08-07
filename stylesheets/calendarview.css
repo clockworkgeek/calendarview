@@ -3,7 +3,6 @@ div.calendar
 {
   font-size: smaller;
   color: #000;
-  z-index: 5;
   width: 17em;
  -webkit-user-select: none;
  -moz-user-select: none;
@@ -116,6 +115,11 @@ div.calendar tr.days td.disabled
 div.calendar tr.days td.disabled:not(.otherDay)
 {
   color: #888;
+}
+
+div.popup
+{
+  z-index: 5;
 }
 
 div.popup td.title
