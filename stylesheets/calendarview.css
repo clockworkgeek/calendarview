@@ -101,6 +101,11 @@ div.calendar tr.days td.otherDay
   color: #bbb;
 }
 
+div.calendar th.weekend,
+div.calendar tr.days .weekend
+{
+}
+
 div.calendar tr.days td.disabled
 {
   background-color: #ddd;

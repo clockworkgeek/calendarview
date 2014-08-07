@@ -79,7 +79,8 @@
             var table = this.datesTable = content.addTag('table'),
                 thead = table.addTag('thead'),
                 tbody = table.addTag('tbody'),
-                days = this.locale.get('day_abbrs');
+                locale = this.locale,
+                days = locale.get('day_abbrs');
             table.insert('<tfoot><tr><td colspan=7/></tr></tfoot>');
             for (var i = 0; i < this.firstDayOfWeek; i++) {
                 days.push(days.shift());
@@ -90,7 +91,7 @@
                     this.locale.get('today') + '</td><td class="cvbutton otherDay">›</td><td class="cvbutton otherDay">»</td></tr>');
             thead.insert('<tr>'+'<th/>'.times(7)+'</tr>');
             thead.select('th').each(function(th, i) {
-                th.update(days[i]);
+                th.update(days[i]).toggleClassName('weekend', locale.isWeekend(i));
             });
             thead.on('click', '.cvbutton', onSelect.bind(this));
 
@@ -108,18 +109,19 @@
 
             var buttons = table.select('.cvbutton'),
                 Y = date.getFullYear(), m = date.getMonth(), d = date.getDate();
-            // equivalent to getParts(3)
-            buttons[0].parts = [Y-1, m, d];
-            buttons[1].parts = [Y, m-1, d];
+            // equivalent to getParts()
+            buttons[0].parts = [Y-1, m];
+            buttons[1].parts = [Y, m-1];
             buttons[2].parts = new Date().getParts(3); // Date.now()
-            buttons[3].parts = [Y, m+1, d];
-            buttons[4].parts = [Y+1, m, d];
+            buttons[3].parts = [Y, m+1];
+            buttons[4].parts = [Y+1, m];
 
             var d = new Date(date.getFullYear(), date.getMonth(), 1);
             d.setDate(1 + this.firstDayOfWeek - d.getDay());
             table.select('.days td').each(function(day) {
                 day.update(d.getDate())
                     .toggleClassName('otherDay', d.getMonth() != date.getMonth())
+                    .toggleClassName('weekend', this.locale.isWeekend(d))
                     .parts = d.getParts(3);
                 this.updatePeriod(date, $R(new Date(d), new Date(d.setDate(d.getDate()+1)), true), day);
             }, this);
