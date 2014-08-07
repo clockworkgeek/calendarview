@@ -112,6 +112,7 @@ div.calendar tr.days td.disabled:not(.otherDay)
   color: #888;
 }
 
-div.calendar .draggableHandler{
+div.popup td.title
+{
   cursor: move;
 }
