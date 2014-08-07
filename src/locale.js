@@ -31,7 +31,8 @@
                 date_format: '%Y-%m-%d',
                 time_format: '%H:%M',
                 datetime_format: '%Y-%m-%d %H:%M',
-                meridian: $w('AM PM')
+                meridian: $w('AM PM'),
+                weekend: [0,6]
             }
     };
 
@@ -61,6 +62,16 @@
                 result = result[args.shift()];
             }
             return result;
+        },
+
+        /**
+         * Simply tests if day is on a weekend or not.
+         * 
+         * @param Date|Number day Either a Date object or integer from 0 to 6
+         * @returns Boolean
+         */
+        isWeekend: function(day) {
+            return this.get('weekend').include(day instanceof Date ? day.getDay() : day);
         },
 
         /**
