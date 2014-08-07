@@ -4,8 +4,8 @@ div.calendar
   font-size: smaller;
   color: #000;
   z-index: 5;
-  width: 217px;
- -webkit-user-select: none;        
+  width: 17em;
+ -webkit-user-select: none;
  -moz-user-select: none;
  -ms-user-select: none;
  -o-user-select: none;
@@ -46,9 +46,9 @@ div.calendar th
 }
 
 div.calendar tr.days td {
+  box-sizing: content-box;
   width: 2em;
   color: #555;
-  text-align: center;
   cursor: pointer;
 }
 
@@ -67,6 +67,7 @@ div.calendar .closeButton
   position: absolute;
   right: 0;
   top: 0;
+  box-sizing: content-box;
   width: 2em;
 }
 
