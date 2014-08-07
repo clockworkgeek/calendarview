@@ -74,7 +74,7 @@
         },
 
         getContent: function() {
-            return new Element('div', {'class': this.containerClass});
+            return new Element('div', {'class': this.containerClass, unselectable: 'on'});
         },
 
         getFormat: function(field) {

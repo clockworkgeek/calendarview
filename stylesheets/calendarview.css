@@ -5,6 +5,12 @@ div.calendar
   color: #000;
   z-index: 5;
   width: 217px;
+ -webkit-user-select: none;        
+ -moz-user-select: none;
+ -ms-user-select: none;
+ -o-user-select: none;
+  user-select: none;
+  cursor: default;
 }
 
 div.calendar table
