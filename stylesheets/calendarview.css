@@ -14,13 +14,9 @@ div.calendar
 
 div.calendar table
 {
-  background-color: #eee;
+  background-color: white;
   border: 1px solid #aaa;
   border-collapse: collapse;
-}
-
-div.calendar thead {
-  background-color: white;
 }
 
 div.calendar td,
@@ -37,9 +33,7 @@ div.calendar td.title
 
 div.calendar th
 {
-  background: #ddd;
-  border-bottom: 1px solid #ccc;
-  border-top: 1px solid #ccc;
+  background: #eee;
   font-weight: bold;
   color: #555;
 }
@@ -86,13 +80,11 @@ div.calendar td.cvbutton:active
 div.calendar tr.days td.selected
 {
   font-weight: bold;
-  background-color: #fff;
   color: #000;
 }
 
 div.calendar tr.days td.today
 {
-  font-weight: bold;
   color: #D50000;
 }
 
@@ -108,9 +100,8 @@ div.calendar tr.days .weekend
 
 div.calendar tr.days td.disabled
 {
-  background-color: #ddd;
+  background-color: #eee;
   cursor: default;
-  text-shadow: 1px 1px 0.01px #fff;
 }
 div.calendar tr.days td.disabled:not(.otherDay)
 {
@@ -130,10 +121,13 @@ div.popup td.title
 div.dropdown
 {
   background-color: #fff;
-  border: 2px solid #ccc;
-  border-radius: 7px;
-  box-shadow: 5px 5px 3px #777;
-  padding: 5px;
+  border: 1px solid #aaa;
+}
+
+div.dropdown table
+{
+	border: 0;
+	margin-top: 5px;
 }
 
 div.dropdown td.title
