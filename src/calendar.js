@@ -79,7 +79,6 @@
                 tbody = table.addTag('tbody'),
                 locale = this.locale,
                 days = locale.get('day_abbrs');
-            table.insert('<tfoot><tr><td colspan=7/></tr></tfoot>');
             for (var i = 0; i < locale.get('firstDayOfWeek'); i++) {
                 days.push(days.shift());
             }
@@ -178,7 +177,7 @@
 
         getContent: function($super) {
             var content = $super();
-            var fieldset = content.select('tfoot td')[0] || content.addTag('fieldset'),
+            var fieldset = this.datesTable && this.datesTable.addTag('tfoot').addTag('td', {colspan: 7}) || content.addTag('fieldset'),
                 hours = enumToSelect($R(0, 23)),
                 minutes = enumToSelect([0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55]);
             fieldset.insert(hours);
