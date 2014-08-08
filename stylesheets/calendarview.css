@@ -140,11 +140,5 @@ div.dropdown
 
 div.dropdown table
 {
-  border: 0;
-  margin-top: 5px;
-}
-
-div.dropdown td.title
-{
-  display: none;
+  border-width: thin 0 0;
 }
