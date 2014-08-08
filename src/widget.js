@@ -133,6 +133,28 @@
         }
     };
 
+
+    /*
+     * Event handler for popup and dropdown types.
+     * 
+     * Reposition parent only, which is an invisible wrapper.
+     * Position is relative to triggering element.
+     * 
+     * Parent can not reliably be a child of trigger as not all elements
+     * can be parents (<img>, <input>) and calendar doesn't want to deal
+     * with inherited styles (fonts, alignment, etc).
+     * 
+     * So repositioning is dealt with explicitly by observing resizes.
+     * 
+     * @this Widget.Popup|Widget.Dropdown
+     */
+    function reposition() {
+        if (this.relativeTo) {
+            var position = this.relativeTo.cumulativeOffset();
+            this.parent.setStyle({left: position.left+'px', top: position.top+'px'});
+        }
+    }
+
     /*
      * Remains hidden until `trigger` element is clicked.
      */
@@ -143,7 +165,7 @@
             trigger = (Object.isArray(trigger) ? trigger : [trigger]).map($).pluck(0).filter(Prototype.K);
             trigger.invoke('observe', 'click', this.toggle.bind(this));
             this.trigger = trigger;
-            Event.observe(window, 'resize', this.reposition.bind(this));
+            Event.observe(window, 'resize', reposition.bind(this));
         },
 
         getContent: function($super) {
@@ -157,7 +179,6 @@
             if (self.Draggable) {
                 new Draggable(element);
             }
-            self.test = element;
             return element;
         },
 
@@ -167,7 +188,7 @@
         toggle: function(event) {
             this.parent.toggle();
             if (event instanceof UIEvent) this.relativeTo = event.findElement();
-            this.reposition();
+            reposition.call(this);
             // place main element somewhere convenient
             var element = this.element,
                 elementSize = element.getDimensions(),
@@ -179,23 +200,65 @@
                 top = -elementSize.height;
             }
             element.setStyle({left: left+'px', top: top+'px'});
+        }
+    };
+
+    function autoScroll(element) {
+        var minScroll = element.cumulativeOffset().top + element.getHeight() - document.viewport.getHeight();
+        if (window.scrollY < minScroll) {
+            window.scrollTo(window.scrollX, minScroll);
+        }
+    }
+
+    /*
+     * Shows as if attached to the primary field.
+     * The field is the trigger.
+     */
+    Widget.Dropdown = {
+        initializeElements: function($super) {
+            $super();
+            this.trigger = this.field.invoke('observe', 'click', this.toggle.bind(this));
+            Event.observe(window, 'resize', reposition.bind(this));
         },
 
-        /*
-         * Reposition parent only, which is an invisible wrapper.
-         * Position is relative to triggering element.
-         * 
-         * Parent can not reliably be a child of trigger as not all elements
-         * can be parents (<img>, <input>) and calendar doesn't want to deal
-         * with inherited styles (fonts, alignment, etc).
-         * 
-         * So repositioning is dealt with explicitly by observing resizes.
-         */
-        reposition: function() {
-            if (this.relativeTo) {
-                var position = this.relativeTo.cumulativeOffset();
-                this.parent.setStyle({left: position.left+'px', top: position.top+'px'});
+        getContent: function($super) {
+            var element = $super().addClassName('dropdown');
+            document.body.insert(
+                this.parent = element.wrap('div').absolutize().hide()
+            );
+            return element;
+        },
+
+        toggle: function(event) {
+            var parent = this.parent.toggle(),
+                element = this.element,
+                field = this.relativeTo = event instanceof UIEvent ? event.findElement() : this.field[0];
+            reposition.call(this);
+            if (parent.visible()) {
+                // Surround `field` and elevate it
+                field.setStyle({position: 'relative', zIndex: 6});
+                // reset for calculations
+                element.setStyle({marginTop: '', marginLeft: '', paddingTop: '', minWidth: ''});
+                var elementWidth = element.measure('width'),
+                    topGap = element.measure('border-top') + element.measure('padding-top'),
+                    leftGap = element.measure('border-left') + element.measure('padding-left');
+                element.setStyle({
+                    marginTop: -topGap + 'px',
+                    marginLeft: (field.getWidth() - elementWidth) / 2 - leftGap + 'px',
+                    paddingTop: topGap + field.getHeight() + 'px',
+                    minWidth: elementWidth,
+                    zIndex: 5
+                });
+                autoScroll(element);
             }
+            else {
+                field.setStyle({position: '', zIndex: ''});
+            }
+        },
+
+        update: function($super, date) {
+            $super(date);
+            autoScroll.defer(this.element);
         }
     };
 

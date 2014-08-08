@@ -75,10 +75,25 @@
       }
       div.popupLauncher {
         margin-top: 10px;
+        cursor: pointer;
       }
       div.popupLauncher:hover {
         background-color: #cde;
+      }
+      div.dropdownLauncher {
         cursor: pointer;
+        padding-right: 30px;
+        position: relative;
+      }
+      div.dropdownLauncher:after {
+        border-left: medium solid #efefef;
+        bottom: 0;
+        content: "▦";
+        display: block;
+        padding: 5px 7px;
+        position: absolute;
+        right: 0;
+        top: 0;
       }
     </style>
     <script src="../lib/prototype.js"></script>
@@ -111,6 +126,15 @@ new Calendar(Widget.Popup, Widget.AutoHide, Calendar.Dates, {
 new Calendar(Widget.Popup, Widget.AutoHide, Calendar.Dates, Calendar.Time, {
     field: 'popupDateDate3',
     trigger: 'popupDateField3'
+});
+
+//Popup Calendar
+new Calendar(Widget.Dropdown, Calendar.Dates, {
+    field: 'dropdownDateDate1'
+});
+
+new Calendar(Widget.Dropdown, Widget.AutoHide, Calendar.Dates, {
+    field: 'dropdownDateDate2'
 });
 
     </script>
@@ -167,14 +191,20 @@ new Calendar(Widget.Popup, Widget.AutoHide, Calendar.Dates, Calendar.Time, {
       
       <div>
         <h3>
-          
+          Dropdown Calendar
         </h3>
+        <div id="dropdownDateDate1" class="dateField dropdownLauncher">
+          2009-01-5
+        </div>
       </div>
     
       <div>
         <h3>
-          
+          Dropdown Calendar closing on a click anywhere else on page
         </h3>
+        <div id="dropdownDateDate2" class="dateField dropdownLauncher">
+          2009-01-6
+        </div>
       </div>
     
     </article>
