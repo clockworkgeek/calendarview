@@ -256,8 +256,8 @@
             }
         },
 
-        update: function($super, date) {
-            $super(date);
+        update: function($super, value) {
+            $super(value);
             autoScroll.defer(this.element);
         }
     };
