@@ -20,6 +20,15 @@
     'use strict';
 
     /*
+     * Like Element.extend or $ but for arrays.
+     * 
+     * @return Array
+     */
+    function elementArray(elements) {
+        return (Object.isArray(elements) ? elements: [elements]).map($).pluck(0).filter(Prototype.K);
+    }
+
+    /*
      * A rather optimistic base type for all field-based widgets.
      * 
      * Constructor accepts multiple mixins which work the same as
@@ -68,8 +77,7 @@
         },
 
         initializeElements: function() {
-            var fields = this.field;
-            this.field = (Object.isArray(fields) ? fields : [fields]).map($).pluck(0).filter(Prototype.K);
+            this.field = elementArray(this.field);
             this.element = this.getContent();
         },
 
@@ -161,10 +169,8 @@
     Widget.Popup = { /** @memberOf Widget.Popup */
         initializeElements: function($super) {
             $super();
-            var trigger = this.trigger;
-            trigger = (Object.isArray(trigger) ? trigger : [trigger]).map($).pluck(0).filter(Prototype.K);
-            trigger.invoke('observe', 'click', this.toggle.bind(this));
-            this.trigger = trigger;
+            (this.trigger = elementArray(this.trigger))
+                .invoke('observe', 'click', this.toggle.bind(this));
             Event.observe(window, 'resize', reposition.bind(this));
         },
 
@@ -232,7 +238,8 @@
         toggle: function(event) {
             var parent = this.parent.toggle(),
                 element = this.element,
-                field = this.relativeTo = event instanceof UIEvent ? event.findElement() : this.field[0];
+                eventElement = event.findElement(),
+                field = this.relativeTo = this.field.find(Element.descendantOf.curry(eventElement)) || eventElement;
             reposition.call(this);
             if (parent.visible()) {
                 // Surround `field` and elevate it
@@ -273,7 +280,9 @@
                 triggers = this.trigger;
             // hide() needs to be internal func so it is named and individual
             function hide(event) {
-                if (!event.findElement().descendantOf(parent) && !triggers.include(event.findElement())) {
+                var eventElement = event.findElement();
+                if (!eventElement.descendantOf(parent) && !triggers.include(eventElement)
+                        && !triggers.find(Element.descendantOf.curry(eventElement))) {
                     parent.hide();
                     document.stopObserving('mousedown', hide);
                 }
