@@ -5,6 +5,8 @@
     <title>CalendarView — JavaScript Calendar Widget</title>
     <link rel="stylesheet" href="../stylesheets/calendarview.css">
     <style>
+
+      /* basic layout */
       * {
         box-sizing: border-box;
       }
@@ -38,11 +40,15 @@
           width: 20%
         }
       }
+
+      /* clearfix */
       article:after {
         clear: both;
         content: "";
         display: block;
       }
+
+      /* border-radius... border-radius everywhere! */
       h3 {
         background-color: #fff;
         -webkit-border-radius: 10px;
@@ -94,6 +100,35 @@
         position: absolute;
         right: 0;
         top: 0;
+      }
+
+      /* prettify the sample calendars */
+      div.calendar table {
+        border-collapse: separate;
+        border-spacing: 0;
+        -webkit-border-radius: 7px;
+        -moz-border-radius: 7px;
+        border-radius: 7px;
+      }
+      div.popup a.closeButton {
+        -webkit-border-top-right-radius: 7px;
+        -moz-border-top-right-radius: 7px;
+        border-top-right-radius: 7px;
+      }
+      div.dropdown {
+        border: 2px solid #ccc;
+        -webkit-border-radius: 7px;
+        -moz-border-radius: 7px;
+        border-radius: 7px;
+        box-shadow: 5px 5px 3px #777;
+        padding: 5px;
+      }
+      div.dropdown table {
+        border-color: #efefef;
+        border-width: medium 0 0;
+        -webkit-border-radius: 0px;
+        -moz-border-radius: 0px;
+        border-radius: 0px;
       }
     </style>
     <script src="../lib/prototype.js"></script>
