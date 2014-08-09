@@ -101,12 +101,12 @@
 
         setValue: function(value) {
             this.field.each(function(field) {
-                value = this.formatFunc(value, this.getFormat(field));
+                var output = this.formatFunc(value, this.getFormat(field));
                 try {
-                    field.setValue(value);
+                    field.setValue(output);
                 }
                 catch (e) {
-                    field.innerHTML = value;
+                    field.innerHTML = output;
                 }
             }, this);
         },

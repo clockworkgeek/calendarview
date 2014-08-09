@@ -79,6 +79,13 @@
         margin-top: 140px;
         text-align: center;
       }
+      small {
+        color: #555;
+        display: block;
+        margin: 10px auto;
+        text-align: center;
+        width: 140px;
+      }
       div.popupLauncher {
         margin-top: 10px;
         cursor: pointer;
@@ -165,7 +172,7 @@ new Calendar(Widget.Popup, Widget.AutoHide, Calendar.Dates, Calendar.Time, {
 
 //Popup Calendar
 new Calendar(Widget.Dropdown, Calendar.Dates, {
-    field: 'dropdownDateDate1'
+    field: ['dropdownDateDate1', 'dropdownDateField1']
 });
 
 new Calendar(Widget.Dropdown, Widget.AutoHide, Calendar.Dates, {
@@ -226,11 +233,12 @@ new Calendar(Widget.Dropdown, Widget.AutoHide, Calendar.Dates, {
       
       <div>
         <h3>
-          Dropdown Calendar
+          Dropdown Calendar, multiple fields
         </h3>
         <div id="dropdownDateDate1" class="dateField dropdownLauncher">
           2009-01-5
         </div>
+        <small id="dropdownDateField1" data-format="%B '%y">January '09</small>
       </div>
     
       <div>
